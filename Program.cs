@@ -52,4 +52,4 @@ app.MapControllers();
 
 app.MapGet("/", () => "La API está en ejecución correctamente.");
 
-app.Run();
+app.Run("http://0.0.0.0:5006");
