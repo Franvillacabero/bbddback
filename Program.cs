@@ -9,9 +9,21 @@ var connectionString = builder.Configuration.GetConnectionString("BBDD");
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>(provider =>
     new UsuarioRepository(connectionString));
 
+builder.Services.AddScoped<IRegistroRepository, RegistroRepository>(provider =>
+    new RegistroRepository(connectionString));
+
+/*builder.Services.AddScoped<ITipoServicioRepository, TipoServicioRepository>(provider =>
+    new TipoServicioRepository(connectionString));*/
+
 // Servicios
 builder.Services.AddScoped<IUsuarioService, UsuarioService>(provider =>
     new UsuarioService(provider.GetRequiredService<IUsuarioRepository>()));
+
+builder.Services.AddScoped<IRegistroService, RegistroService>(provider =>
+    new RegistroService(provider.GetRequiredService<IRegistroRepository>()));
+
+/*builder.Services.AddScoped<ITipoServicioService, TipoServicioService>(provider =>
+    new TipoServicioService(provider.GetRequiredService<ITipoServicioRepository>()));*/
 
 
 var AllowAll = "_AllowAll";
@@ -52,4 +64,4 @@ app.MapControllers();
 
 app.MapGet("/", () => "La API está en ejecución correctamente.");
 
-app.Run("http://0.0.0.0:5006");
+app.Run();
