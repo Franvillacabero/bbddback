@@ -84,12 +84,13 @@ namespace Back.Repository
             {
                 await connection.OpenAsync();
 
-                string query = "INSERT INTO Registro (Id_Usuario, Id_TipoServicio, Fecha_Registro, Estado) VALUES (@Id_Usuario, @Id_TipoServicio, @Fecha_Registro, @Estado)";
+                string query = "INSERT INTO Registro (Id_Registro, Id_TipoServicio, Fecha_Registro, Estado) VALUES (@Id_Registro, @Id_TipoServicio, @Fecha_Registro, @Estado)";
                 using (var command = new MySqlCommand(query, connection))
                 {
+                    command.Parameters.AddWithValue("@Id_Registro", registro.Id_Registro);
                     command.Parameters.AddWithValue("@Id_TipoServicio", registro.Id_TipoServicio);
-                    /*command.Parameters.AddWithValue("@Fecha_Registro", registro.Fecha_Registro);
-                    command.Parameters.AddWithValue("@Estado", registro.Estado);*/
+                    command.Parameters.AddWithValue("@Fecha_Registro", registro.FechaCreacion);
+                    command.Parameters.AddWithValue("@Estado", registro.Notas);
 
                     await command.ExecuteNonQueryAsync();
                 }
@@ -102,7 +103,7 @@ namespace Back.Repository
             {
                 await connection.OpenAsync();
 
-                string query = "UPDATE Registro SET Id_Usuario = @Id_Usuario, Id_TipoServicio = @Id_TipoServicio, Fecha_Registro = @Fecha_Registro, Estado = @Estado WHERE Id_Registro = @Id_Registro";
+                string query = "UPDATE Registro SET Id_Registro = @Id_Registro, Id_TipoServicio = @Id_TipoServicio, Fecha_Registro = @Fecha_Registro, Estado = @Estado WHERE Id_Registro = @Id_Registro";
                 using (var command = new MySqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Id_TipoServicio", registro.Id_TipoServicio);
