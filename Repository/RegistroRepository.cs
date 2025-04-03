@@ -30,11 +30,12 @@ namespace Back.Repository
                             var registro = new Registro
                             {
                                 Id_Registro = reader.GetInt32(0),
-                                Id_TipoServicio = reader.GetInt32(1),
-                                Usuario = reader.GetString(2),
-                                Contraseña = reader.GetString(3),
-                                Notas = reader.GetString(4),
-                                FechaCreacion = reader.GetDateTime(5),
+                                Id_Cliente = reader.GetInt32(1),
+                                Id_TipoServicio = reader.GetInt32(2),
+                                Usuario = reader.GetString(3),
+                                Contraseña = reader.GetString(4),
+                                Notas = reader.GetString(5),
+                                FechaCreacion = reader.GetDateTime(6),
                             };
 
                             registros.Add(registro);
@@ -65,11 +66,12 @@ namespace Back.Repository
                             registro = new Registro
                             {
                                 Id_Registro = reader.GetInt32(0),
-                                Id_TipoServicio = reader.GetInt32(1),
-                                Usuario = reader.GetString(2),
-                                Contraseña = reader.GetString(3),
-                                Notas = reader.GetString(4),
-                                FechaCreacion = reader.GetDateTime(5),
+                                Id_Cliente = reader.GetInt32(1),
+                                Id_TipoServicio = reader.GetInt32(2),
+                                Usuario = reader.GetString(3),
+                                Contraseña = reader.GetString(4),
+                                Notas = reader.GetString(5),
+                                FechaCreacion = reader.GetDateTime(6),
                             };
                         }
                     }
@@ -84,18 +86,22 @@ namespace Back.Repository
             {
                 await connection.OpenAsync();
 
-                string query = "INSERT INTO Registro (Id_Registro, Id_TipoServicio, Fecha_Registro, Estado) VALUES (@Id_Registro, @Id_TipoServicio, @Fecha_Registro, @Estado)";
+                string query = "INSERT INTO Registro (id_registro, id_cliente, id_tiposervicio, usuario, contraseña, notas) VALUES (@Id_Registro, @Id_Cliente, @Id_TipoServicio, @Usuario, @Contraseña, @Notas)";
+
                 using (var command = new MySqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Id_Registro", registro.Id_Registro);
+                    command.Parameters.AddWithValue("@Id_Cliente", registro.Id_Cliente);
                     command.Parameters.AddWithValue("@Id_TipoServicio", registro.Id_TipoServicio);
-                    command.Parameters.AddWithValue("@Fecha_Registro", registro.FechaCreacion);
-                    command.Parameters.AddWithValue("@Estado", registro.Notas);
+                    command.Parameters.AddWithValue("@Usuario", registro.Usuario);
+                    command.Parameters.AddWithValue("@Contraseña", registro.Contraseña);
+                    command.Parameters.AddWithValue("@Notas", registro.Notas ?? (object)DBNull.Value); // Permitir valores nulos
 
                     await command.ExecuteNonQueryAsync();
                 }
             }
         }
+
 
         public async Task UpdateAsync(Registro registro)
         {
@@ -103,13 +109,16 @@ namespace Back.Repository
             {
                 await connection.OpenAsync();
 
-                string query = "UPDATE Registro SET Id_Registro = @Id_Registro, Id_TipoServicio = @Id_TipoServicio, Fecha_Registro = @Fecha_Registro, Estado = @Estado WHERE Id_Registro = @Id_Registro";
+                string query = "UPDATE Registro SET Id_Cliente = @Id_Cliente, Id_TipoServicio = @Id_TipoServicio, Usuario = @Usuario, Contraseña = @Contraseña, Notas = @Notas, Fecha_Registro = @Fecha_Registro WHERE Id_Registro = @Id_Registro";
                 using (var command = new MySqlCommand(query, connection))
                 {
-                    command.Parameters.AddWithValue("@Id_TipoServicio", registro.Id_TipoServicio);
-                    /*command.Parameters.AddWithValue("@Fecha_Registro", registro.Fecha_Registro);
-                    command.Parameters.AddWithValue("@Estado", registro.Estado);*/
                     command.Parameters.AddWithValue("@Id_Registro", registro.Id_Registro);
+                    command.Parameters.AddWithValue("@Id_Cliente", registro.Id_Cliente);
+                    command.Parameters.AddWithValue("@Id_TipoServicio", registro.Id_TipoServicio);
+                    command.Parameters.AddWithValue("@Usuario", registro.Usuario);
+                    command.Parameters.AddWithValue("@Contraseña", registro.Contraseña);
+                    command.Parameters.AddWithValue("@Notas", registro.Notas ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue("@Fecha_Registro", registro.FechaCreacion);
 
                     await command.ExecuteNonQueryAsync();
                 }

@@ -33,49 +33,6 @@ namespace Back.Controllers
             return Ok(usuario);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody] Usuario usuario)
-        {
-            if (usuario == null)
-            {
-                return BadRequest("Usuario no puede ser nulo.");
-            }
-
-            await _usuarioRepository.AddAsync(usuario);
-            return CreatedAtAction(nameof(GetById), new { id = usuario.Id_Usuario }, usuario);
-        }
-
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] Usuario usuario)
-        {
-            if (usuario == null || id != usuario.Id_Usuario)
-            {
-                return BadRequest("Usuario no puede ser nulo y el ID debe coincidir.");
-            }
-
-            var existingUsuario = await _usuarioRepository.GetByIdAsync(id);
-            if (existingUsuario == null)
-            {
-                return NotFound();
-            }
-
-            await _usuarioRepository.UpdateAsync(usuario);
-            return NoContent();
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            var usuario = await _usuarioRepository.GetByIdAsync(id);
-            if (usuario == null)
-            {
-                return NotFound();
-            }
-
-            await _usuarioRepository.DeleteAsync(id);
-            return NoContent();
-        }
-
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] Usuario usuario)
         {
