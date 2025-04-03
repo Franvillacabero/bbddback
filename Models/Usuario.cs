@@ -5,25 +5,22 @@ namespace Models
         public int Id_Usuario { get; set; }
         public string Nombre { get; set; }
         public string Contraseña { get; set; }
-        public string Correo { get; set; }
         public DateTime Fecha_Registro { get; set; } = DateTime.Now;
 
 
         public Usuario() { }
 
-        public Usuario(int id_usuarios, string nombre, string apellido, string correo, string contraseña, DateTime fechaCreacion, DateTime fechaModificacion)
+        public Usuario(int id_Usuario, string nombre, string contraseña, DateTime fecha_Registro)
         {
-            Id_Usuario = id_usuarios;
+            Id_Usuario = id_Usuario;
             Nombre = nombre;
-            Correo = correo;
             Contraseña = contraseña;
-            Fecha_Registro = fechaCreacion;
-
+            Fecha_Registro = fecha_Registro;
         }
 
         public void MostrarDetalles()
         {
-            Console.WriteLine($"ID: {Id_Usuario}, Nombre: {Nombre}, Correo: {Correo}, Contraseña: {Contraseña}, Fecha de Creación: {Fecha_Registro}");
+            Console.WriteLine($"ID: {Id_Usuario}, Nombre: {Nombre}, Contraseña: {Contraseña}, Fecha de Registro: {Fecha_Registro}");
         }
     }
 }

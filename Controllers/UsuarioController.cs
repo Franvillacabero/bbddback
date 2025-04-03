@@ -79,12 +79,12 @@ namespace Back.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] Usuario usuario)
         {
-            if (usuario == null || string.IsNullOrEmpty(usuario.Correo) || string.IsNullOrEmpty(usuario.Contraseña))
+            if (usuario == null || string.IsNullOrEmpty(usuario.Nombre) || string.IsNullOrEmpty(usuario.Contraseña))
             {
-                return BadRequest("Correo y contraseña son requeridos.");
+                return BadRequest("Usuario y contraseña son requeridos.");
             }
 
-            var existingUsuario = await _usuarioRepository.GetByEmailAndPasswordAsync(usuario.Correo, usuario.Contraseña);
+            var existingUsuario = await _usuarioRepository.GetByNameAndPasswordAsync(usuario.Nombre, usuario.Contraseña);
             if (existingUsuario == null)
             {
                 return Unauthorized("Credenciales inválidas.");

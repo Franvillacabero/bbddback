@@ -32,8 +32,7 @@ namespace Back.Repository
                                 Id_Usuario = reader.GetInt32(0),
                                 Nombre = reader.GetString(1),
                                 Contraseña = reader.GetString(2),
-                                Correo = reader.GetString(3),
-                                Fecha_Registro = reader.GetDateTime(4)
+                                Fecha_Registro = reader.GetDateTime(3)
                             };
 
                             usuarios.Add(usuario);
@@ -66,8 +65,7 @@ namespace Back.Repository
                                 Id_Usuario = reader.GetInt32(0),
                                 Nombre = reader.GetString(1),
                                 Contraseña = reader.GetString(2),
-                                Correo = reader.GetString(3),
-                                Fecha_Registro = reader.GetDateTime(4)
+                                Fecha_Registro = reader.GetDateTime(3)
                             };
                         }
                     }
@@ -82,12 +80,11 @@ namespace Back.Repository
             {
                 await connection.OpenAsync();
 
-                string query = "INSERT INTO Usuario (Nombre, Apellido, Contraseña, Correo, Fecha_Registro) VALUES (@Nombre, @Apellido, @Contraseña, @Correo, @Fecha_Registro)";
+                string query = "INSERT INTO Usuario (Nombre, Contraseña, Fecha_Registro) VALUES (@Nombre, @Contraseña, @Fecha_Registro)";
                 using (var command = new MySqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Nombre", usuario.Nombre);
                     command.Parameters.AddWithValue("@Contraseña", usuario.Contraseña);
-                    command.Parameters.AddWithValue("@Correo", usuario.Correo);
                     command.Parameters.AddWithValue("@Fecha_Registro", usuario.Fecha_Registro);
 
                     await command.ExecuteNonQueryAsync();
@@ -101,13 +98,13 @@ namespace Back.Repository
             {
                 await connection.OpenAsync();
 
-                string query = "UPDATE Usuario SET Nombre = @Nombre, Apellido = @Apellido, Contraseña = @Contraseña, Correo = @Correo WHERE Id_Usuario = @Id";
+                string query = "UPDATE Usuario SET Nombre = @Nombre, Contraseña = @Contraseña, Fecha_Registro = @Fecha_Registro WHERE Id_Usuario = @Id";
                 using (var command = new MySqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Id", usuario.Id_Usuario);
                     command.Parameters.AddWithValue("@Nombre", usuario.Nombre);
-                    command.Parameters.AddWithValue("@Contraseña", usuario.Contraseña);
-                    command.Parameters.AddWithValue("@Correo", usuario.Correo);
+                    command.Parameters.AddWithValue("@Contraseña", usuario.Contraseña);                    
+                    command.Parameters.AddWithValue("@Fecha_Registro", usuario.Fecha_Registro);
 
                     await command.ExecuteNonQueryAsync();
                 }
@@ -130,7 +127,7 @@ namespace Back.Repository
             }
         }
 
-        public async Task<Usuario?> GetByEmailAndPasswordAsync(string email, string password)
+        public async Task<Usuario?> GetByNameAndPasswordAsync(string name, string password)
         {
             Usuario? usuario = null;
 
@@ -138,10 +135,10 @@ namespace Back.Repository
             {
                 await connection.OpenAsync();
 
-                string query = "SELECT * FROM Usuario WHERE Correo = @Correo AND Contraseña= @Contraseña";
+                string query = "SELECT * FROM Usuario WHERE Nombre = @Nombre AND Contraseña = @Contraseña";
                 using (var command = new MySqlCommand(query, connection))
                 {
-                    command.Parameters.AddWithValue("@Correo", email);
+                    command.Parameters.AddWithValue("@Nombre", name);
                     command.Parameters.AddWithValue("@Contraseña", password);
 
                     using (var reader = await command.ExecuteReaderAsync())
@@ -153,8 +150,7 @@ namespace Back.Repository
                                 Id_Usuario = reader.GetInt32(0),
                                 Nombre = reader.GetString(1),
                                 Contraseña = reader.GetString(2),
-                                Correo = reader.GetString(3),
-                                Fecha_Registro = reader.GetDateTime(4)
+                                Fecha_Registro = reader.GetDateTime(3)
                             };
                         }
                     }

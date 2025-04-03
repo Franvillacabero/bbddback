@@ -9,7 +9,7 @@ namespace Back.Repository
         Task AddAsync(Usuario usuario);
         Task UpdateAsync(Usuario usuario);
         Task DeleteAsync(int id);
-        Task<Usuario?> GetByEmailAndPasswordAsync(string email, string password);
+        Task<Usuario?> GetByNameAndPasswordAsync(string name, string password);
         Task<bool> ActualizarContraseñaAsync(int idUsuario, string nuevaContraseña);
 
     }
