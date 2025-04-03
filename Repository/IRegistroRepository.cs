@@ -9,6 +9,6 @@ namespace Back.Repository
         Task AddAsync(Registro registro);
         Task UpdateAsync(Registro registro);
         Task DeleteAsync(int id);
-        Task<List<Registro>> GetByTipoServicioIdAsync(int tipoServicioId);
+        Task<List<Registro>> GetByTipoServicioIdAsync(int Id_TipoServicio);
     }
 }

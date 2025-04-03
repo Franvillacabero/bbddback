@@ -37,9 +37,9 @@ namespace Back.Services
             await _registroRepository.DeleteAsync(id);
         }
 
-        public async Task<List<Registro>> GetByTipoServicioIdAsync(int tipoServicioId)
+        public async Task<List<Registro>> GetByTipoServicioIdAsync(int Id_TipoServicio)
         {
-            return await _registroRepository.GetByTipoServicioIdAsync(tipoServicioId);
+            return await _registroRepository.GetByTipoServicioIdAsync(Id_TipoServicio);
         }
     }
 }

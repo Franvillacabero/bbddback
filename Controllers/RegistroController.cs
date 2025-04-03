@@ -77,10 +77,10 @@ namespace Back.Controllers
             return NoContent();
         }
 
-        [HttpGet("tipoServicio/{tipoServicioId}")]
-        public async Task<IActionResult> GetByTipoServicioId(int tipoServicioId)
+        [HttpGet("tipoServicio/{Id_TipoServicio}")]
+        public async Task<IActionResult> GetByTipoServicioId(int Id_TipoServicio)
         {
-            var registros = await _registroRepository.GetByTipoServicioIdAsync(tipoServicioId);
+            var registros = await _registroRepository.GetByTipoServicioIdAsync(Id_TipoServicio);
             return Ok(registros);
         }
     }

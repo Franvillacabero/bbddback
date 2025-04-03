@@ -4,7 +4,7 @@ namespace Models
     {
 
         public int Id_Registro { get; set; }
-        public int Id_Tipo_Servicio { get; set; }  // Clave foránea
+        public int Id_TipoServicio { get; set; }  // Clave foránea
         public string Usuario { get; set; } = string.Empty;
         public string Contraseña { get; set; } = string.Empty;
         public string? Notas { get; set; }
@@ -18,7 +18,7 @@ namespace Models
         public Registro(int id_Registro, int id_Tipo_Servicio, string usuario, string contraseña, string? notas, DateTime fechaCreacion)
         {
             Id_Registro = id_Registro;
-            Id_Tipo_Servicio = id_Tipo_Servicio;
+            Id_TipoServicio = id_Tipo_Servicio;
             Usuario = usuario;
             Contraseña = contraseña;
             Notas = notas;
@@ -27,7 +27,7 @@ namespace Models
         
         public void MostrarDetalles()
         {
-            Console.WriteLine($"ID: {Id_Registro}, ID Tipo Servicio: {Id_Tipo_Servicio}, Usuario: {Usuario}, Contraseña: {Contraseña}, Notas: {Notas}, Fecha de Creación: {FechaCreacion}");
+            Console.WriteLine($"ID: {Id_Registro}, ID Tipo Servicio: {Id_TipoServicio}, Usuario: {Usuario}, Contraseña: {Contraseña}, Notas: {Notas}, Fecha de Creación: {FechaCreacion}");
         }
     }
 }

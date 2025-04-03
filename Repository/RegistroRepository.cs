@@ -30,7 +30,7 @@ namespace Back.Repository
                             var registro = new Registro
                             {
                                 Id_Registro = reader.GetInt32(0),
-                                Id_Tipo_Servicio = reader.GetInt32(1),
+                                Id_TipoServicio = reader.GetInt32(1),
                                 Usuario = reader.GetString(2),
                                 Contraseña = reader.GetString(3),
                                 Notas = reader.GetString(4),
@@ -65,7 +65,7 @@ namespace Back.Repository
                             registro = new Registro
                             {
                                 Id_Registro = reader.GetInt32(0),
-                                Id_Tipo_Servicio = reader.GetInt32(1),
+                                Id_TipoServicio = reader.GetInt32(1),
                                 Usuario = reader.GetString(2),
                                 Contraseña = reader.GetString(3),
                                 Notas = reader.GetString(4),
@@ -84,10 +84,10 @@ namespace Back.Repository
             {
                 await connection.OpenAsync();
 
-                string query = "INSERT INTO Registro (Id_Usuario, Id_Tipo_Servicio, Fecha_Registro, Estado) VALUES (@Id_Usuario, @Id_Tipo_Servicio, @Fecha_Registro, @Estado)";
+                string query = "INSERT INTO Registro (Id_Usuario, Id_TipoServicio, Fecha_Registro, Estado) VALUES (@Id_Usuario, @Id_TipoServicio, @Fecha_Registro, @Estado)";
                 using (var command = new MySqlCommand(query, connection))
                 {
-                    command.Parameters.AddWithValue("@Id_Tipo_Servicio", registro.Id_Tipo_Servicio);
+                    command.Parameters.AddWithValue("@Id_TipoServicio", registro.Id_TipoServicio);
                     /*command.Parameters.AddWithValue("@Fecha_Registro", registro.Fecha_Registro);
                     command.Parameters.AddWithValue("@Estado", registro.Estado);*/
 
@@ -102,10 +102,10 @@ namespace Back.Repository
             {
                 await connection.OpenAsync();
 
-                string query = "UPDATE Registro SET Id_Usuario = @Id_Usuario, Id_Tipo_Servicio = @Id_Tipo_Servicio, Fecha_Registro = @Fecha_Registro, Estado = @Estado WHERE Id_Registro = @Id_Registro";
+                string query = "UPDATE Registro SET Id_Usuario = @Id_Usuario, Id_TipoServicio = @Id_TipoServicio, Fecha_Registro = @Fecha_Registro, Estado = @Estado WHERE Id_Registro = @Id_Registro";
                 using (var command = new MySqlCommand(query, connection))
                 {
-                    command.Parameters.AddWithValue("@Id_Tipo_Servicio", registro.Id_Tipo_Servicio);
+                    command.Parameters.AddWithValue("@Id_TipoServicio", registro.Id_TipoServicio);
                     /*command.Parameters.AddWithValue("@Fecha_Registro", registro.Fecha_Registro);
                     command.Parameters.AddWithValue("@Estado", registro.Estado);*/
                     command.Parameters.AddWithValue("@Id_Registro", registro.Id_Registro);
@@ -131,7 +131,7 @@ namespace Back.Repository
             }
         }
 
-        public async Task<List<Registro>> GetByTipoServicioIdAsync(int tipoServicioId)
+        public async Task<List<Registro>> GetByTipoServicioIdAsync(int Id_TipoServicio)
         {
             var registros = new List<Registro>();
 
@@ -139,10 +139,10 @@ namespace Back.Repository
             {
                 await connection.OpenAsync();
 
-                string query = "SELECT * FROM Registro WHERE Id_Tipo_Servicio = @Id_Tipo_Servicio";
+                string query = "SELECT * FROM Registro WHERE Id_TipoServicio = @Id_TipoServicio";
                 using (var command = new MySqlCommand(query, connection))
                 {
-                    command.Parameters.AddWithValue("@Id_Tipo_Servicio", tipoServicioId);
+                    command.Parameters.AddWithValue("@Id_TipoServicio", Id_TipoServicio);
 
                     using (var reader = await command.ExecuteReaderAsync())
                     {
@@ -151,7 +151,7 @@ namespace Back.Repository
                             var registro = new Registro
                             {
                                 Id_Registro = reader.GetInt32(0),
-                                Id_Tipo_Servicio = reader.GetInt32(1),
+                                Id_TipoServicio = reader.GetInt32(1),
                                 Usuario = reader.GetString(2),
                                 Contraseña = reader.GetString(3),
                                 Notas = reader.GetString(4),
