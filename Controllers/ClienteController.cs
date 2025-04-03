@@ -38,7 +38,7 @@ namespace Back.Controllers
         {
             if (cliente == null)
             {
-                return BadRequest("Cliente cannot be null.");
+                return BadRequest("Cliente no puede ser null.");
             }
 
             await _clienteService.AddAsync(cliente);
@@ -50,7 +50,7 @@ namespace Back.Controllers
         {
             if (id != cliente.Id_Cliente)
             {
-                return BadRequest("ID mismatch.");
+                return BadRequest("ID no coincide.");
             }
 
             var existingCliente = await _clienteService.GetByIdAsync(id);
