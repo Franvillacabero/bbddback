@@ -12,8 +12,11 @@ builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>(provider =>
 builder.Services.AddScoped<IRegistroRepository, RegistroRepository>(provider =>
     new RegistroRepository(connectionString));
 
-/*builder.Services.AddScoped<ITipoServicioRepository, TipoServicioRepository>(provider =>
-    new TipoServicioRepository(connectionString));*/
+builder.Services.AddScoped<IClienteRepository, ClienteRepository>(provider =>
+    new ClienteRepository(connectionString));
+
+builder.Services.AddScoped<ITipoServicioRepository, TipoServicioRepository>(provider =>
+    new TipoServicioRepository(connectionString));
 
 // Servicios
 builder.Services.AddScoped<IUsuarioService, UsuarioService>(provider =>
@@ -22,8 +25,11 @@ builder.Services.AddScoped<IUsuarioService, UsuarioService>(provider =>
 builder.Services.AddScoped<IRegistroService, RegistroService>(provider =>
     new RegistroService(provider.GetRequiredService<IRegistroRepository>()));
 
-/*builder.Services.AddScoped<ITipoServicioService, TipoServicioService>(provider =>
-    new TipoServicioService(provider.GetRequiredService<ITipoServicioRepository>()));*/
+builder.Services.AddScoped<IClienteService, ClienteService>(provider =>
+    new ClienteService(provider.GetRequiredService<IClienteRepository>()));
+
+builder.Services.AddScoped<ITipoServicioService, TipoServicioService>(provider =>
+    new TipoServicioService(provider.GetRequiredService<ITipoServicioRepository>()));
 
 
 var AllowAll = "_AllowAll";
