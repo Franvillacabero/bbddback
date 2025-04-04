@@ -33,7 +33,8 @@ namespace Back.Repository
                                 Nombre = reader.GetString(1),
                                 Contraseña = reader.GetString(2),
                                 Fecha_Registro = reader.GetDateTime(3),
-                                EsAdmin = reader.GetBoolean(4) // Asumiendo que la columna 5 es EsAdmin
+                                EsAdmin = reader.GetBoolean(4), // Asumiendo que la columna 5 es EsAdmin
+                                Clientes = new List<int>(5)
                             };
 
                             usuarios.Add(usuario);
@@ -67,7 +68,8 @@ namespace Back.Repository
                                 Nombre = reader.GetString(1),
                                 Contraseña = reader.GetString(2),
                                 Fecha_Registro = reader.GetDateTime(3),
-                                EsAdmin = reader.GetBoolean(4) // Asumiendo que la columna 5 es EsAdmin
+                                EsAdmin = reader.GetBoolean(4), // Asumiendo que la columna 5 es EsAdmin
+                                Clientes = new List<int>(5)
                             };
                         }
                     }
@@ -82,13 +84,14 @@ namespace Back.Repository
             {
                 await connection.OpenAsync();
 
-                string query = "INSERT INTO Usuario (Nombre, Contraseña, Fecha_Registro, EsAmin) VALUES (@Nombre, @Contraseña, @Fecha_Registro, @EsAdmin)";
+                string query = "INSERT INTO Usuario (Nombre, Contraseña, Fecha_Registro, esAdmin, Clientes) VALUES (@Nombre, @Contraseña, @Fecha_Registro, @EsAdmin, @Clientes)";
                 using (var command = new MySqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Nombre", usuario.Nombre);
                     command.Parameters.AddWithValue("@Contraseña", usuario.Contraseña);
                     command.Parameters.AddWithValue("@Fecha_Registro", usuario.Fecha_Registro);
                     command.Parameters.AddWithValue("@EsAdmin", usuario.EsAdmin);
+                    command.Parameters.AddWithValue("@Clientes", usuario.Clientes); // Asumiendo que tienes una forma de manejar la lista de clientes
 
                     await command.ExecuteNonQueryAsync();
                 }
@@ -101,7 +104,7 @@ namespace Back.Repository
             {
                 await connection.OpenAsync();
 
-                string query = "UPDATE Usuario SET Nombre = @Nombre, Contraseña = @Contraseña, Fecha_Registro = @Fecha_Registro, EsAmin = @EsAmin WHERE Id_Usuario = @Id";
+                string query = "UPDATE Usuario SET Nombre = @Nombre, Contraseña = @Contraseña, Fecha_Registro = @Fecha_Registro, EsAmin = @EsAmin, Clientes = @Clientes WHERE Id_Usuario = @Id";
                 using (var command = new MySqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Id", usuario.Id_Usuario);
@@ -109,6 +112,7 @@ namespace Back.Repository
                     command.Parameters.AddWithValue("@Contraseña", usuario.Contraseña);                    
                     command.Parameters.AddWithValue("@Fecha_Registro", usuario.Fecha_Registro);
                     command.Parameters.AddWithValue("@EsAdmin", usuario.EsAdmin);
+                    command.Parameters.AddWithValue("@Clientes", usuario.Clientes); // Asumiendo que tienes una forma de manejar la lista de clientes
 
                     await command.ExecuteNonQueryAsync();
                 }
