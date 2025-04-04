@@ -83,11 +83,15 @@ namespace Back.Repository
             {
                 await connection.OpenAsync();
 
+<<<<<<< HEAD
                 string query = "INSERT INTO Usuario (Nombre, Contraseña, Fecha_Registro, EsAdmin, Clientes) VALUES (@Nombre, @Contraseña, @Fecha_Registro, @EsAdmin, @Clientes)";
+=======
+                string query = "INSERT INTO Usuario (Nombre, Contrasena, Fecha_Registro, EsAdmin, Clientes) VALUES (@Nombre, @Contrasena, @Fecha_Registro, @EsAdmin, @Clientes)";
+>>>>>>> e779f272337c81ca78749123934be58f330c0747
                 using (var command = new MySqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Nombre", usuario.Nombre);
-                    command.Parameters.AddWithValue("@Contraseña", usuario.Contraseña);
+                    command.Parameters.AddWithValue("@Contrasena", usuario.Contraseña);
                     command.Parameters.AddWithValue("@Fecha_Registro", usuario.Fecha_Registro);
                     command.Parameters.AddWithValue("@EsAdmin", usuario.EsAdmin);
 
@@ -106,12 +110,20 @@ namespace Back.Repository
             {
                 await connection.OpenAsync();
 
+<<<<<<< HEAD
                 string query = "UPDATE Usuario SET Nombre = @Nombre, Contraseña = @Contraseña, Fecha_Registro = @Fecha_Registro, EsAdmin = @EsAdmin, Clientes = @Clientes WHERE Id_Usuario = @Id";
+=======
+                string query = "UPDATE Usuario SET Nombre = @Nombre, Contrasena = @Contrasena, Fecha_Registro = @Fecha_Registro, EsAdmin = @EsAdmin, Clientes = @Clientes WHERE Id_Usuario = @Id";
+>>>>>>> e779f272337c81ca78749123934be58f330c0747
                 using (var command = new MySqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Id", usuario.Id_Usuario);
                     command.Parameters.AddWithValue("@Nombre", usuario.Nombre);
+<<<<<<< HEAD
                     command.Parameters.AddWithValue("@Contraseña", usuario.Contraseña);
+=======
+                    command.Parameters.AddWithValue("@Contrasena", usuario.Contraseña);
+>>>>>>> e779f272337c81ca78749123934be58f330c0747
                     command.Parameters.AddWithValue("@Fecha_Registro", usuario.Fecha_Registro);
                     command.Parameters.AddWithValue("@EsAdmin", usuario.EsAdmin);
 
@@ -148,11 +160,11 @@ namespace Back.Repository
             {
                 await connection.OpenAsync();
 
-                string query = "SELECT * FROM Usuario WHERE Nombre = @Nombre AND Contraseña = @Contraseña";
+                string query = "SELECT * FROM Usuario WHERE Nombre = @Nombre AND Contrasena = @Contrasena";
                 using (var command = new MySqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Nombre", name);
-                    command.Parameters.AddWithValue("@Contraseña", password);
+                    command.Parameters.AddWithValue("@Contrasena", password);
 
                     using (var reader = await command.ExecuteReaderAsync())
                     {
@@ -186,7 +198,11 @@ namespace Back.Repository
             {
                 await connection.OpenAsync();
 
+<<<<<<< HEAD
                 string query = "UPDATE Usuario SET Contraseña = @NuevaContrasena WHERE Id_Usuario = @IdUsuario";
+=======
+                string query = "UPDATE Usuario SET Contrasena = @NuevaContrasena WHERE Id_Usuario = @IdUsuario";
+>>>>>>> e779f272337c81ca78749123934be58f330c0747
                 using (var command = new MySqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@IdUsuario", idUsuario);
@@ -198,4 +214,8 @@ namespace Back.Repository
             }
         }
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> e779f272337c81ca78749123934be58f330c0747
