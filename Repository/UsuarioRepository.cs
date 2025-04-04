@@ -87,7 +87,7 @@ namespace Back.Repository
                 using (var command = new MySqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Nombre", usuario.Nombre);
-                    command.Parameters.AddWithValue("@Contrasena", usuario.Contraseña);
+                    command.Parameters.AddWithValue("@Contraseña", usuario.Contraseña);
                     command.Parameters.AddWithValue("@Fecha_Registro", usuario.Fecha_Registro);
                     command.Parameters.AddWithValue("@EsAdmin", usuario.EsAdmin);
 
@@ -148,11 +148,11 @@ namespace Back.Repository
             {
                 await connection.OpenAsync();
 
-                string query = "SELECT * FROM Usuario WHERE Nombre = @Nombre AND Contrasena = @Contrasena";
+                string query = "SELECT * FROM Usuario WHERE Nombre = @Nombre AND Contraseña = @Contraseña";
                 using (var command = new MySqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Nombre", name);
-                    command.Parameters.AddWithValue("@Contrasena", password);
+                    command.Parameters.AddWithValue("@Contraseña", password);
 
                     using (var reader = await command.ExecuteReaderAsync())
                     {
