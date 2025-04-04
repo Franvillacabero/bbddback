@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using MySql.Data.MySqlClient;
 using Models;
 using System.Text.Json;
@@ -7,10 +8,12 @@ namespace Back.Repository
     public class UsuarioRepository : IUsuarioRepository
     {
         private readonly string _connectionString;
+        private readonly PasswordHasher<Usuario> _passwordHasher;
 
         public UsuarioRepository(string connectionString)
         {
             _connectionString = connectionString;
+            _passwordHasher = new PasswordHasher<Usuario>();
         }
 
         public async Task<List<Usuario>> GetAllAsync()
@@ -83,11 +86,13 @@ namespace Back.Repository
             {
                 await connection.OpenAsync();
 
+                string hashedPassword = _passwordHasher.HashPassword(usuario, usuario.Contraseña);
+
                 string query = "INSERT INTO Usuario (Nombre, Contraseña, Fecha_Registro, EsAdmin, Clientes) VALUES (@Nombre, @Contraseña, @Fecha_Registro, @EsAdmin, @Clientes)";
                 using (var command = new MySqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Nombre", usuario.Nombre);
-                    command.Parameters.AddWithValue("@Contraseña", usuario.Contraseña);
+                    command.Parameters.AddWithValue("@Contraseña", hashedPassword);
                     command.Parameters.AddWithValue("@Fecha_Registro", usuario.Fecha_Registro);
                     command.Parameters.AddWithValue("@EsAdmin", usuario.EsAdmin);
 
@@ -106,12 +111,14 @@ namespace Back.Repository
             {
                 await connection.OpenAsync();
 
+                string hashedPassword = _passwordHasher.HashPassword(usuario, usuario.Contraseña);
+
                 string query = "UPDATE Usuario SET Nombre = @Nombre, Contraseña = @Contraseña, Fecha_Registro = @Fecha_Registro, EsAdmin = @EsAdmin, Clientes = @Clientes WHERE Id_Usuario = @Id";
                 using (var command = new MySqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Id", usuario.Id_Usuario);
                     command.Parameters.AddWithValue("@Nombre", usuario.Nombre);
-                    command.Parameters.AddWithValue("@Contraseña", usuario.Contraseña);
+                    command.Parameters.AddWithValue("@Contraseña", hashedPassword);  // Guardamos la contraseña hasheada
                     command.Parameters.AddWithValue("@Fecha_Registro", usuario.Fecha_Registro);
                     command.Parameters.AddWithValue("@EsAdmin", usuario.EsAdmin);
 
@@ -148,11 +155,10 @@ namespace Back.Repository
             {
                 await connection.OpenAsync();
 
-                string query = "SELECT * FROM Usuario WHERE Nombre = @Nombre AND Contraseña = @Contraseña";
+                string query = "SELECT * FROM Usuario WHERE Nombre = @Nombre";
                 using (var command = new MySqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Nombre", name);
-                    command.Parameters.AddWithValue("@Contraseña", password);
 
                     using (var reader = await command.ExecuteReaderAsync())
                     {
@@ -172,12 +178,18 @@ namespace Back.Repository
                 }
             }
 
-            if (usuario != null && usuario.Contraseña == password)
+            if (usuario != null)
             {
-                return usuario;
+                // Verificamos la contraseña hasheada usando PasswordHasher
+                var verificationResult = _passwordHasher.VerifyHashedPassword(usuario, usuario.Contraseña, password);
+
+                if (verificationResult == PasswordVerificationResult.Success)
+                {
+                    return usuario;  // Contraseña válida
+                }
             }
 
-            return null;
+            return null;  // Contraseña inválida
         }
 
         public async Task<bool> ActualizarContraseñaAsync(int idUsuario, string nuevaContraseña)
@@ -186,11 +198,14 @@ namespace Back.Repository
             {
                 await connection.OpenAsync();
 
-                string query = "UPDATE Usuario SET Contraseña = @NuevaContrasena WHERE Id_Usuario = @IdUsuario";
+                // Hasheamos la nueva contraseña antes de actualizarla
+                string hashedPassword = _passwordHasher.HashPassword(null, nuevaContraseña);
+
+                string query = "UPDATE Usuario SET Contraseña = @NuevaContraseña WHERE Id_Usuario = @IdUsuario";
                 using (var command = new MySqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@IdUsuario", idUsuario);
-                    command.Parameters.AddWithValue("@NuevaContrasena", nuevaContraseña);
+                    command.Parameters.AddWithValue("@NuevaContraseña", hashedPassword);
 
                     int rowsAffected = await command.ExecuteNonQueryAsync();
                     return rowsAffected > 0;
