@@ -83,5 +83,12 @@ namespace Back.Controllers
             var registros = await _registroRepository.GetByTipoServicioIdAsync(Id_TipoServicio);
             return Ok(registros);
         }
+
+        [HttpGet("cliente/{Id_Cliente}")]
+        public async Task<IActionResult> GetByClienteId(int Id_Cliente)
+        {
+            var registros = await _registroRepository.GetByClienteIdAsync(Id_Cliente);
+            return Ok(registros);
+        }
     }
 }

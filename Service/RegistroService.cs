@@ -41,5 +41,10 @@ namespace Back.Services
         {
             return await _registroRepository.GetByTipoServicioIdAsync(Id_TipoServicio);
         }
+
+        public async Task<List<Registro>> GetByClienteIdAsync(int Id_Cliente)
+        {
+            return await _registroRepository.GetByClienteIdAsync(Id_Cliente);
+        }
     }
 }

@@ -187,5 +187,41 @@ namespace Back.Repository
             }
             return registros;
         }
+
+        public async Task<List<Registro>> GetByClienteIdAsync(int Id_Cliente)
+        {
+            var registros = new List<Registro>();
+
+            using (var connection = new MySqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+
+                string query = "SELECT * FROM Registro WHERE Id_Cliente = @Id_Cliente";
+                using (var command = new MySqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@Id_Cliente", Id_Cliente);
+
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            var registro = new Registro
+                            {
+                                Id_Registro = reader.GetInt32(0),
+                                Id_Cliente = reader.GetInt32(1),
+                                Id_TipoServicio = reader.GetInt32(2),
+                                Usuario = reader.GetString(3),
+                                Contraseña = reader.GetString(4),
+                                Notas = reader.GetString(5),
+                                FechaCreacion = reader.GetDateTime(6),
+                            };
+
+                            registros.Add(registro);
+                        }
+                    }
+                }
+            }
+            return registros;
+        }
     }
 }
