@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Identity;
+using BCrypt.Net;
 using MySql.Data.MySqlClient;
 using Models;
 using System.Text.Json;
@@ -8,12 +8,10 @@ namespace Back.Repository
     public class UsuarioRepository : IUsuarioRepository
     {
         private readonly string _connectionString;
-        private readonly PasswordHasher<Usuario> _passwordHasher;
 
         public UsuarioRepository(string connectionString)
         {
             _connectionString = connectionString;
-            _passwordHasher = new PasswordHasher<Usuario>();
         }
 
         public async Task<List<Usuario>> GetAllAsync()
@@ -86,7 +84,8 @@ namespace Back.Repository
             {
                 await connection.OpenAsync();
 
-                string hashedPassword = _passwordHasher.HashPassword(usuario, usuario.Contraseña);
+                // Hashear la contraseña antes de guardar usando BCrypt
+                string hashedPassword = BCrypt.Net.BCrypt.HashPassword(usuario.Contraseña);
 
                 string query = "INSERT INTO Usuario (Nombre, Contraseña, Fecha_Registro, EsAdmin, Clientes) VALUES (@Nombre, @Contraseña, @Fecha_Registro, @EsAdmin, @Clientes)";
                 using (var command = new MySqlCommand(query, connection))
@@ -111,14 +110,26 @@ namespace Back.Repository
             {
                 await connection.OpenAsync();
 
-                string hashedPassword = _passwordHasher.HashPassword(usuario, usuario.Contraseña);
+                // Obtener usuario actual desde la DB
+                var usuarioActual = await GetByIdAsync(usuario.Id_Usuario);
+                string hashedPassword;
+
+                // Comparar contraseñas (para evitar rehashear un hash)
+                if (usuarioActual != null && usuarioActual.Contraseña != usuario.Contraseña)
+                {
+                    hashedPassword = BCrypt.Net.BCrypt.HashPassword(usuario.Contraseña);
+                }
+                else
+                {
+                    hashedPassword = usuario.Contraseña; // Ya está hasheada
+                }
 
                 string query = "UPDATE Usuario SET Nombre = @Nombre, Contraseña = @Contraseña, Fecha_Registro = @Fecha_Registro, EsAdmin = @EsAdmin, Clientes = @Clientes WHERE Id_Usuario = @Id";
                 using (var command = new MySqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Id", usuario.Id_Usuario);
                     command.Parameters.AddWithValue("@Nombre", usuario.Nombre);
-                    command.Parameters.AddWithValue("@Contraseña", hashedPassword);  // Guardamos la contraseña hasheada
+                    command.Parameters.AddWithValue("@Contraseña", hashedPassword);
                     command.Parameters.AddWithValue("@Fecha_Registro", usuario.Fecha_Registro);
                     command.Parameters.AddWithValue("@EsAdmin", usuario.EsAdmin);
 
@@ -130,6 +141,7 @@ namespace Back.Repository
                 }
             }
         }
+
 
         public async Task DeleteAsync(int id)
         {
@@ -180,10 +192,10 @@ namespace Back.Repository
 
             if (usuario != null)
             {
-                // Verificamos la contraseña hasheada usando PasswordHasher
-                var verificationResult = _passwordHasher.VerifyHashedPassword(usuario, usuario.Contraseña, password);
+                // Verificación con BCrypt
+                bool passwordValid = BCrypt.Net.BCrypt.Verify(password, usuario.Contraseña);
 
-                if (verificationResult == PasswordVerificationResult.Success)
+                if (passwordValid)
                 {
                     return usuario;  // Contraseña válida
                 }
@@ -192,14 +204,18 @@ namespace Back.Repository
             return null;  // Contraseña inválida
         }
 
+
         public async Task<bool> ActualizarContraseñaAsync(int idUsuario, string nuevaContraseña)
         {
             using (var connection = new MySqlConnection(_connectionString))
             {
                 await connection.OpenAsync();
 
-                // Hasheamos la nueva contraseña antes de actualizarla
-                string hashedPassword = _passwordHasher.HashPassword(null, nuevaContraseña);
+                var usuario = await GetByIdAsync(idUsuario);
+                if (usuario == null) return false;
+
+                // Hasheamos la nueva contraseña con BCrypt
+                string hashedPassword = BCrypt.Net.BCrypt.HashPassword(nuevaContraseña);
 
                 string query = "UPDATE Usuario SET Contraseña = @NuevaContraseña WHERE Id_Usuario = @IdUsuario";
                 using (var command = new MySqlCommand(query, connection))
@@ -212,5 +228,6 @@ namespace Back.Repository
                 }
             }
         }
+
     }
 }
