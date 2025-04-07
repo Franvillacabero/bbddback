@@ -77,20 +77,27 @@ namespace Back.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] Usuario usuario)
+        public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
-            if (usuario == null || string.IsNullOrEmpty(usuario.Nombre) || string.IsNullOrEmpty(usuario.Contraseña))
+            var usuario = await _usuarioRepository.GetByNameAsync(request.Nombre);
+
+            if (usuario == null)
             {
-                return BadRequest("Usuario y contraseña son requeridos.");
+                return NotFound(new { mensaje = "Usuario no encontrado" });
             }
 
-            var existingUsuario = await _usuarioRepository.GetByNameAndPasswordAsync(usuario.Nombre, usuario.Contraseña);
-            if (existingUsuario == null)
+            bool passwordValida = BCrypt.Net.BCrypt.Verify(request.Contraseña, usuario.Contraseña);
+
+            if (!passwordValida)
             {
-                return Unauthorized("Credenciales inválidas.");
+                return Unauthorized(new { mensaje = "Contraseña incorrecta" });
             }
 
-            return Ok(existingUsuario);
+            return Ok(new
+            {
+                usuario.Id_Usuario,
+                usuario.Nombre,
+            });
         }
     }
 }

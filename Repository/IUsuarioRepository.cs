@@ -11,6 +11,8 @@ namespace Back.Repository
         Task DeleteAsync(int id);
         Task<Usuario?> GetByNameAndPasswordAsync(string name, string password);
         Task<bool> ActualizarContraseñaAsync(int idUsuario, string nuevaContraseña);
+        Task<Usuario?> GetByNameAsync(string nombre);
+
 
     }
 }

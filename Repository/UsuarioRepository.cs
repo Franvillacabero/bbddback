@@ -161,48 +161,16 @@ namespace Back.Repository
 
         public async Task<Usuario?> GetByNameAndPasswordAsync(string name, string password)
         {
-            Usuario? usuario = null;
+            var usuario = await GetByNameAsync(name);
 
-            using (var connection = new MySqlConnection(_connectionString))
+            if (usuario != null && BCrypt.Net.BCrypt.Verify(password, usuario.Contraseña))
             {
-                await connection.OpenAsync();
-
-                string query = "SELECT * FROM Usuario WHERE Nombre = @Nombre";
-                using (var command = new MySqlCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@Nombre", name);
-
-                    using (var reader = await command.ExecuteReaderAsync())
-                    {
-                        if (await reader.ReadAsync())
-                        {
-                            usuario = new Usuario
-                            {
-                                Id_Usuario = reader.GetInt32(0),
-                                Nombre = reader.GetString(1),
-                                Contraseña = reader.GetString(2),
-                                Fecha_Registro = reader.GetDateTime(3),
-                                EsAdmin = reader.GetBoolean(4),
-                                Clientes = JsonSerializer.Deserialize<List<int>>(reader.GetString(5)) ?? new List<int>()
-                            };
-                        }
-                    }
-                }
+                return usuario;  // Contraseña válida
             }
 
-            if (usuario != null)
-            {
-                // Verificación con BCrypt
-                bool passwordValid = BCrypt.Net.BCrypt.Verify(password, usuario.Contraseña);
-
-                if (passwordValid)
-                {
-                    return usuario;  // Contraseña válida
-                }
-            }
-
-            return null;  // Contraseña inválida
+            return null;
         }
+
 
 
         public async Task<bool> ActualizarContraseñaAsync(int idUsuario, string nuevaContraseña)
@@ -227,6 +195,40 @@ namespace Back.Repository
                     return rowsAffected > 0;
                 }
             }
+        }
+
+        public async Task<Usuario?> GetByNameAsync(string nombre)
+        {
+            Usuario? usuario = null;
+
+            using (var connection = new MySqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+
+                string query = "SELECT * FROM Usuario WHERE Nombre = @Nombre";
+                using (var command = new MySqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@Nombre", nombre);
+
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            usuario = new Usuario
+                            {
+                                Id_Usuario = reader.GetInt32(0),
+                                Nombre = reader.GetString(1),
+                                Contraseña = reader.GetString(2),
+                                Fecha_Registro = reader.GetDateTime(3),
+                                EsAdmin = reader.GetBoolean(4),
+                                Clientes = JsonSerializer.Deserialize<List<int>>(reader.GetString(5)) ?? new List<int>()
+                            };
+                        }
+                    }
+                }
+            }
+
+            return usuario;
         }
 
     }
