@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Identity;
 using MySql.Data.MySqlClient;
 using Models;
 
@@ -7,12 +6,10 @@ namespace Back.Repository
     public class RegistroRepository : IRegistroRepository
     {
         private readonly string _connectionString;
-        private readonly PasswordHasher<Registro> _passwordHasher;
 
         public RegistroRepository(string connectionString)
         {
             _connectionString = connectionString;
-            _passwordHasher = new PasswordHasher<Registro>();
         }
 
         public async Task<List<Registro>> GetAllAsync()
@@ -89,8 +86,8 @@ namespace Back.Repository
             {
                 await connection.OpenAsync();
 
-                // Hasheamos la contraseña antes de insertarla usando PasswordHasher
-                string hashedPassword = _passwordHasher.HashPassword(registro, registro.Contraseña);
+                // Encriptamos la contraseña antes de insertarla
+                string encryptedPassword = AesEncryptionHelper.Encrypt(registro.Contraseña);
 
                 string query = "INSERT INTO Registro (id_registro, id_cliente, id_tiposervicio, usuario, contraseña, notas) " +
                                "VALUES (@Id_Registro, @Id_Cliente, @Id_TipoServicio, @Usuario, @Contraseña, @Notas)";
@@ -101,7 +98,7 @@ namespace Back.Repository
                     command.Parameters.AddWithValue("@Id_Cliente", registro.Id_Cliente);
                     command.Parameters.AddWithValue("@Id_TipoServicio", registro.Id_TipoServicio);
                     command.Parameters.AddWithValue("@Usuario", registro.Usuario);
-                    command.Parameters.AddWithValue("@Contraseña", hashedPassword);  // Guardamos la contraseña hasheada
+                    command.Parameters.AddWithValue("@Contraseña", encryptedPassword);  // Guardamos la contraseña encriptada
                     command.Parameters.AddWithValue("@Notas", registro.Notas ?? (object)DBNull.Value);  // Permitir valores nulos
 
                     await command.ExecuteNonQueryAsync();
@@ -116,8 +113,8 @@ namespace Back.Repository
             {
                 await connection.OpenAsync();
 
-                // Hasheamos la contraseña antes de actualizarla
-                string hashedPassword = _passwordHasher.HashPassword(registro, registro.Contraseña);
+                // Encriptamos la contraseña antes de actualizarla
+                string encryptedPassword = AesEncryptionHelper.Encrypt(registro.Contraseña);
 
                 string query = "UPDATE Registro SET Id_Cliente = @Id_Cliente, Id_TipoServicio = @Id_TipoServicio, " +
                                "Usuario = @Usuario, Contraseña = @Contraseña, Notas = @Notas, Fecha_Registro = @Fecha_Registro " +
@@ -128,7 +125,7 @@ namespace Back.Repository
                     command.Parameters.AddWithValue("@Id_Cliente", registro.Id_Cliente);
                     command.Parameters.AddWithValue("@Id_TipoServicio", registro.Id_TipoServicio);
                     command.Parameters.AddWithValue("@Usuario", registro.Usuario);
-                    command.Parameters.AddWithValue("@Contraseña", hashedPassword);  // Guardamos la contraseña hasheada
+                    command.Parameters.AddWithValue("@Contraseña", encryptedPassword);  // Guardamos la contraseña encriptada
                     command.Parameters.AddWithValue("@Notas", registro.Notas ?? (object)DBNull.Value);
                     command.Parameters.AddWithValue("@Fecha_Registro", registro.FechaCreacion);
 
