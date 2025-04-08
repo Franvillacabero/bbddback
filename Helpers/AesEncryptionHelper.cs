@@ -3,9 +3,25 @@ using System.Text;
 
 public static class AesEncryptionHelper
 {
-    // Clave y IV estáticos (IMPORTANTE: cambiar en producción)
-    private static readonly byte[] key = Encoding.UTF8.GetBytes("NetyMediaSecretKey32BytesLong!");
-    private static readonly byte[] iv = Encoding.UTF8.GetBytes("NetyMediaIV16Bytes!");
+    // Usa una clave de 32 bytes (256 bits) y un IV de 16 bytes (128 bits)
+    private static readonly byte[] key = GetValidKey("NetyMediaSecretKey32BytesLong!");
+    private static readonly byte[] iv = GetValidIV("NetyMediaIV16Bytes!");
+
+    private static byte[] GetValidKey(string originalKey)
+    {
+        using (var sha256 = SHA256.Create())
+        {
+            return sha256.ComputeHash(Encoding.UTF8.GetBytes(originalKey));
+        }
+    }
+
+    private static byte[] GetValidIV(string originalIV)
+    {
+        using (var md5 = MD5.Create())
+        {
+            return md5.ComputeHash(Encoding.UTF8.GetBytes(originalIV)).Take(16).ToArray();
+        }
+    }
 
     public static string Encrypt(string plainText)
     {
