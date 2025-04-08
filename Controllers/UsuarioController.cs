@@ -97,6 +97,7 @@ namespace Back.Controllers
             {
                 usuario.Id_Usuario,
                 usuario.Nombre,
+                usuario.Clientes,
             });
         }
     }
