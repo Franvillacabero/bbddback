@@ -90,5 +90,16 @@ namespace Back.Controllers
             var registros = await _registroRepository.GetByClienteIdAsync(Id_Cliente);
             return Ok(registros);
         }
+
+        [HttpGet("password/{id}")]
+        public async Task<IActionResult> GetDecryptedPassword(int id)
+        {
+            var password = await _registroRepository.GetDecryptedPasswordAsync(id);
+            
+            if (password == null)
+                return NotFound();
+
+            return Ok(new { password });
+        }
     }
 }

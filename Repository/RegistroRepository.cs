@@ -80,6 +80,34 @@ namespace Back.Repository
             return registro;
         }
 
+        public async Task<string?> GetDecryptedPasswordAsync(int id)
+        {
+            using (var connection = new MySqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+
+                string query = "SELECT Contraseña FROM Registro WHERE Id_Registro = @Id";
+                using (var command = new MySqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@Id", id);
+
+                    var encryptedPassword = await command.ExecuteScalarAsync() as string;
+                    
+                    if (string.IsNullOrEmpty(encryptedPassword))
+                        return null;
+
+                    try 
+                    {
+                        return AesEncryptionHelper.Decrypt(encryptedPassword);
+                    }
+                    catch 
+                    {
+                        return null;
+                    }
+                }
+            }
+        }
+
         public async Task AddAsync(Registro registro)
         {
             using (var connection = new MySqlConnection(_connectionString))
@@ -106,26 +134,35 @@ namespace Back.Repository
             }
         }
 
-
         public async Task UpdateAsync(Registro registro)
         {
             using (var connection = new MySqlConnection(_connectionString))
             {
                 await connection.OpenAsync();
 
-                // Encriptamos la contraseña antes de actualizarla
-                string encryptedPassword = AesEncryptionHelper.Encrypt(registro.Contraseña);
+                // Solo encriptamos si se proporciona una nueva contraseña
+                string? encryptedPassword = string.IsNullOrEmpty(registro.Contraseña) 
+                    ? null 
+                    : AesEncryptionHelper.Encrypt(registro.Contraseña);
 
                 string query = "UPDATE Registro SET Id_Cliente = @Id_Cliente, Id_TipoServicio = @Id_TipoServicio, " +
-                               "Usuario = @Usuario, Contraseña = @Contraseña, Notas = @Notas, Fecha_Registro = @Fecha_Registro " +
+                               "Usuario = @Usuario, " +
+                               (encryptedPassword != null ? "Contraseña = @Contraseña, " : "") +
+                               "Notas = @Notas, Fecha_Registro = @Fecha_Registro " +
                                "WHERE Id_Registro = @Id_Registro";
+                
                 using (var command = new MySqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Id_Registro", registro.Id_Registro);
                     command.Parameters.AddWithValue("@Id_Cliente", registro.Id_Cliente);
                     command.Parameters.AddWithValue("@Id_TipoServicio", registro.Id_TipoServicio);
                     command.Parameters.AddWithValue("@Usuario", registro.Usuario);
-                    command.Parameters.AddWithValue("@Contraseña", encryptedPassword);  // Guardamos la contraseña encriptada
+                    
+                    if (encryptedPassword != null)
+                    {
+                        command.Parameters.AddWithValue("@Contraseña", encryptedPassword);
+                    }
+                    
                     command.Parameters.AddWithValue("@Notas", registro.Notas ?? (object)DBNull.Value);
                     command.Parameters.AddWithValue("@Fecha_Registro", registro.FechaCreacion);
 
