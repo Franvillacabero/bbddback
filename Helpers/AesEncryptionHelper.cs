@@ -1,64 +1,80 @@
 using System.Security.Cryptography;
+using System.Text;
 
 public static class AesEncryptionHelper
 {
-    // Método para generar una clave aleatoria de 32 bytes (256 bits) para AES-256
-    private static readonly byte[] key = GenerateRandomBytes(32);  // Clave de 32 bytes para AES-256
-    private static readonly byte[] iv = GenerateRandomBytes(16);   // IV de 16 bytes (128 bits)
+    // Clave y IV estáticos (IMPORTANTE: cambiar en producción)
+    private static readonly byte[] key = Encoding.UTF8.GetBytes("NetyMediaSecretKey32BytesLong!");
+    private static readonly byte[] iv = Encoding.UTF8.GetBytes("NetyMediaIV16Bytes!");
 
-    // Generar bytes aleatorios de longitud especificada
-    private static byte[] GenerateRandomBytes(int length)
-    {
-        using (var rng = new RNGCryptoServiceProvider())
-        {
-            byte[] randomBytes = new byte[length];
-            rng.GetBytes(randomBytes);
-            return randomBytes;
-        }
-    }
-
-    // Método para encriptar texto
     public static string Encrypt(string plainText)
     {
-        using (Aes aesAlg = Aes.Create())
-        {
-            aesAlg.Key = key;   // Usar la clave generada aleatoriamente
-            aesAlg.IV = iv;     // Usar el IV generado aleatoriamente
+        if (string.IsNullOrEmpty(plainText)) return string.Empty;
 
-            ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
-            using (var msEncrypt = new System.IO.MemoryStream())
+        try 
+        {
+            using (Aes aesAlg = Aes.Create())
             {
-                using (var csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
+                aesAlg.Key = key;
+                aesAlg.IV = iv;
+
+                ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
+                
+                using (var msEncrypt = new MemoryStream())
                 {
-                    using (var swEncrypt = new System.IO.StreamWriter(csEncrypt))
+                    using (var csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
                     {
-                        swEncrypt.Write(plainText);
+                        using (var swEncrypt = new StreamWriter(csEncrypt))
+                        {
+                            swEncrypt.Write(plainText);
+                        }
                     }
+                    
+                    return Convert.ToBase64String(msEncrypt.ToArray());
                 }
-                return Convert.ToBase64String(msEncrypt.ToArray());
             }
+        }
+        catch (Exception ex)
+        {
+            // Log de error real
+            Console.WriteLine($"Error de encriptación: {ex.Message}");
+            throw;
         }
     }
 
-    // Método para desencriptar texto
     public static string Decrypt(string cipherText)
     {
-        using (Aes aesAlg = Aes.Create())
-        {
-            aesAlg.Key = key;   // Usar la clave generada aleatoriamente
-            aesAlg.IV = iv;     // Usar el IV generado aleatoriamente
+        if (string.IsNullOrEmpty(cipherText)) return string.Empty;
 
-            ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
-            using (var msDecrypt = new System.IO.MemoryStream(Convert.FromBase64String(cipherText)))
+        try 
+        {
+            byte[] cipherBytes = Convert.FromBase64String(cipherText);
+
+            using (Aes aesAlg = Aes.Create())
             {
-                using (var csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
+                aesAlg.Key = key;
+                aesAlg.IV = iv;
+
+                ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
+                
+                using (var msDecrypt = new MemoryStream(cipherBytes))
                 {
-                    using (var srDecrypt = new System.IO.StreamReader(csDecrypt))
+                    using (var csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
                     {
-                        return srDecrypt.ReadToEnd();
+                        using (var srDecrypt = new StreamReader(csDecrypt))
+                        {
+                            return srDecrypt.ReadToEnd();
+                        }
                     }
                 }
             }
+        }
+        catch (Exception ex)
+        {
+            // Log de error real
+            Console.WriteLine($"Error de desencriptación: {ex.Message}");
+            Console.WriteLine($"Texto cifrado recibido: {cipherText}");
+            throw;
         }
     }
 }
