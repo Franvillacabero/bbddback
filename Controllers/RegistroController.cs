@@ -91,15 +91,22 @@ namespace Back.Controllers
             return Ok(registros);
         }
 
-        [HttpGet("password/{id}")]
-        public async Task<IActionResult> GetDecryptedPassword(int id)
+        [HttpGet("decrypt/{id}")]
+        public async Task<IActionResult> DecryptPassword(int id)
         {
-            var password = await _registroRepository.GetDecryptedPasswordAsync(id);
-            
-            if (password == null)
+            var registro = await _registroRepository.GetByIdAsync(id);
+            if (registro == null)
                 return NotFound();
 
-            return Ok(new { password });
+            try 
+            {
+                string decryptedPassword = AesEncryptionHelper.Decrypt(registro.Contraseña);
+                return Ok(decryptedPassword);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("Error al desencriptar");
+            }
         }
     }
 }
