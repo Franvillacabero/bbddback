@@ -35,7 +35,11 @@ namespace Back.Repository
                                 Usuario = reader.GetString(3),
                                 Contraseña = reader.GetString(4),
                                 Notas = reader.GetString(5),
-                                FechaCreacion = reader.GetDateTime(6),
+                                Url = reader.GetString(6),
+                                Url_2 = reader.GetString(7),
+                                Isp = reader.GetString(8),
+                                Nombre_BBDD = reader.GetString(9),
+                                FechaCreacion = reader.GetDateTime(10),
                             };
 
                             registros.Add(registro);
@@ -71,7 +75,11 @@ namespace Back.Repository
                                 Usuario = reader.GetString(3),
                                 Contraseña = reader.GetString(4),
                                 Notas = reader.GetString(5),
-                                FechaCreacion = reader.GetDateTime(6),
+                                Url = reader.GetString(6),
+                                Url_2 = reader.GetString(7),
+                                Isp = reader.GetString(8),
+                                Nombre_BBDD = reader.GetString(9),
+                                FechaCreacion = reader.GetDateTime(10),
                             };
                         }
                     }
@@ -89,8 +97,8 @@ namespace Back.Repository
                 // Encriptamos la contraseña antes de insertarla
                 string encryptedPassword = AesEncryptionHelper.Encrypt(registro.Contraseña);
 
-                string query = "INSERT INTO Registro (id_registro, id_cliente, id_tiposervicio, usuario, contraseña, notas) " +
-                               "VALUES (@Id_Registro, @Id_Cliente, @Id_TipoServicio, @Usuario, @Contraseña, @Notas)";
+                string query = "INSERT INTO Registro (id_registro, id_cliente, id_tiposervicio, usuario, contraseña, notas, url, url_2, isp, nombre_BBDD) " +
+                               "VALUES (@Id_Registro, @Id_Cliente, @Id_TipoServicio, @Usuario, @Contraseña, @Notas, @Url, @Url_2, @Isp, @Nombre_BBDD)";
 
                 using (var command = new MySqlCommand(query, connection))
                 {
@@ -100,6 +108,10 @@ namespace Back.Repository
                     command.Parameters.AddWithValue("@Usuario", registro.Usuario);
                     command.Parameters.AddWithValue("@Contraseña", encryptedPassword);  // Guardamos la contraseña encriptada
                     command.Parameters.AddWithValue("@Notas", registro.Notas ?? (object)DBNull.Value);  // Permitir valores nulos
+                    command.Parameters.AddWithValue("@Url", registro.Url ?? (object)DBNull.Value);  // Permitir valores nulos
+                    command.Parameters.AddWithValue("@Url_2", registro.Url_2 ?? (object)DBNull.Value);  // Permitir valores nulos
+                    command.Parameters.AddWithValue("@Isp", registro.Isp ?? (object)DBNull.Value);  // Permitir valores nulos
+
 
                     await command.ExecuteNonQueryAsync();
                 }
@@ -116,8 +128,7 @@ namespace Back.Repository
                 // Encriptamos la contraseña antes de actualizarla
                 string encryptedPassword = AesEncryptionHelper.Encrypt(registro.Contraseña);
 
-                string query = "UPDATE Registro SET Id_Cliente = @Id_Cliente, Id_TipoServicio = @Id_TipoServicio, " +
-                               "Usuario = @Usuario, Contraseña = @Contraseña, Notas = @Notas, Fecha_Registro = @Fecha_Registro " +
+                string query = "UPDATE Registro SET Id_Cliente = @Id_Cliente, Id_TipoServicio = @Id_TipoServicio, Usuario = @Usuario, Contraseña = @Contraseña, Notas = @Notas, Url = @Url, Url_2 = @Url_2, Isp = @Isp, Nombre_BBDD = @Nombre_BBDD, Fecha_Registro = @Fecha_Registro " +
                                "WHERE Id_Registro = @Id_Registro";
                 using (var command = new MySqlCommand(query, connection))
                 {
@@ -127,6 +138,10 @@ namespace Back.Repository
                     command.Parameters.AddWithValue("@Usuario", registro.Usuario);
                     command.Parameters.AddWithValue("@Contraseña", encryptedPassword);  // Guardamos la contraseña encriptada
                     command.Parameters.AddWithValue("@Notas", registro.Notas ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue("@Url", registro.Url ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue("@Url_2", registro.Url_2 ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue("@Isp", registro.Isp ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue("@Nombre_BBDD", registro.Nombre_BBDD ?? (object)DBNull.Value);
                     command.Parameters.AddWithValue("@Fecha_Registro", registro.FechaCreacion);
 
                     await command.ExecuteNonQueryAsync();
@@ -174,6 +189,10 @@ namespace Back.Repository
                                 Usuario = reader.GetString(2),
                                 Contraseña = reader.GetString(3),
                                 Notas = reader.GetString(4),
+                                Url = reader.GetString(5),
+                                Url_2 = reader.GetString(6),
+                                Isp = reader.GetString(7),
+                                Nombre_BBDD = reader.GetString(8),
                                 FechaCreacion = reader.GetDateTime(5),
                             };
 
@@ -210,6 +229,10 @@ namespace Back.Repository
                                 Usuario = reader.GetString(3),
                                 Contraseña = reader.GetString(4),
                                 Notas = reader.GetString(5),
+                                Url = reader.GetString(6),
+                                Url_2 = reader.GetString(7),
+                                Isp = reader.GetString(8),
+                                Nombre_BBDD = reader.GetString(9),
                                 FechaCreacion = reader.GetDateTime(6),
                             };
 
