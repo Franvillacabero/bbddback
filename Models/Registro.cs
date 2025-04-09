@@ -9,11 +9,11 @@ namespace Models
         public string Usuario { get; set; } = string.Empty;
         public string Contraseña { get; set; } = string.Empty;
         public string? Notas { get; set; }
+        public DateTime FechaCreacion { get; set; } = DateTime.UtcNow;
         public string? Url { get; set; } = string.Empty;
         public string? Url_2 { get; set; } = string.Empty;
         public string? Isp { get; set; } = string.Empty;
         public string? Nombre_BBDD { get; set; } = string.Empty;
-        public DateTime FechaCreacion { get; set; } = DateTime.UtcNow;
 
         public Registro() { }
 
@@ -25,11 +25,11 @@ namespace Models
             Usuario = usuario;
             Contraseña = contraseña;
             Notas = notas;
+            FechaCreacion = fechaCreacion;
             Url = url;
             Url_2 = url_2;
             Isp = isp;
             Nombre_BBDD = nombre_BBDD;
-            FechaCreacion = fechaCreacion;
         }
 
         public void MostrarDetalles() {

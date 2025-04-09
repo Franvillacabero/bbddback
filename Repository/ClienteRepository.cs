@@ -32,6 +32,7 @@ namespace Back.Repository
                                 Id_Cliente = reader.GetInt32(0),
                                 Nombre_Empresa = reader.GetString(1),
                                 FechaRegistro = reader.GetDateTime(2),
+                                Notas = reader.IsDBNull(3) ? null : reader.GetString(3),
                             };
 
                             clientes.Add(cliente);
@@ -64,6 +65,7 @@ namespace Back.Repository
                                 Id_Cliente = reader.GetInt32(0),
                                 Nombre_Empresa = reader.GetString(1),
                                 FechaRegistro = reader.GetDateTime(2),
+                                Notas = reader.IsDBNull(3) ? null : reader.GetString(3),
                             };
                         }
                     }
@@ -78,11 +80,11 @@ namespace Back.Repository
             {
                 await connection.OpenAsync();
 
-                string query = "INSERT INTO Cliente (Nombre_Empresa, FechaRegistro) VALUES (@Nombre_Empresa, @FechaRegistro)";
+                string query = "INSERT INTO Cliente (Nombre_Empresa, Notas) VALUES (@Nombre_Empresa, @Notas)";
                 using (var command = new MySqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Nombre_Empresa", cliente.Nombre_Empresa);
-                    command.Parameters.AddWithValue("@FechaRegistro", cliente.FechaRegistro);
+                    command.Parameters.AddWithValue("@Notas", cliente.Notas ?? (object)DBNull.Value);
 
                     await command.ExecuteNonQueryAsync();
                 }
@@ -95,12 +97,12 @@ namespace Back.Repository
             {
                 await connection.OpenAsync();
 
-                string query = "UPDATE Cliente SET Nombre_Empresa = @Nombre_Empresa, FechaRegistro = @FechaRegistro WHERE Id_Cliente = @Id";
+                string query = "UPDATE Cliente SET Nombre_Empresa = @Nombre_Empresa, Notas = @Notas WHERE Id_Cliente = @Id";
                 using (var command = new MySqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Id", cliente.Id_Cliente);
                     command.Parameters.AddWithValue("@Nombre_Empresa", cliente.Nombre_Empresa);
-                    command.Parameters.AddWithValue("@FechaRegistro", cliente.FechaRegistro);
+                    command.Parameters.AddWithValue("@Notas", cliente.Notas ?? (object)DBNull.Value);
 
                     await command.ExecuteNonQueryAsync();
                 }
