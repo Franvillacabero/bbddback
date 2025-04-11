@@ -6,7 +6,6 @@ namespace Back.Middleware
     public class ApiKeyMiddleware
     {
         private readonly RequestDelegate _next;
-        private const string ApiKeyValue = "your-secret-key-123";
 
         public ApiKeyMiddleware(RequestDelegate next)
         {
