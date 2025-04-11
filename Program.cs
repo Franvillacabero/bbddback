@@ -1,6 +1,8 @@
 using Back.Controllers;
 using Back.Repository;
 using Back.Services;
+using System.Net;
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("BBDD");
@@ -31,43 +33,73 @@ builder.Services.AddScoped<IClienteService, ClienteService>(provider =>
 builder.Services.AddScoped<ITipoServicioService, TipoServicioService>(provider =>
     new TipoServicioService(provider.GetRequiredService<ITipoServicioRepository>()));
 
-
+// Configuración de CORS
 var AllowAll = "_AllowAll";
-
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(name: "_AllowAll",
+    options.AddPolicy(name: AllowAll,
         policy =>
         {
-                  policy.AllowAnyOrigin()
+            policy.AllowAnyOrigin()
                   .AllowAnyMethod()
                   .AllowAnyHeader();
         });
 });
 
-// Add services to the container.
+// Configuración de Kestrel para HTTPS
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.Listen(IPAddress.Any, 5006, listenOptions =>
+    {
+        // Para desarrollo con certificado autofirmado
+        // listenOptions.UseHttps();
+        
+        // Para producción, especificar el certificado
+        // listenOptions.UseHttps("/path/to/certificate.pfx", "password");
+    });
+});
+
+// Añadir servicios al contenedor
 builder.Services.AddControllers();
 
 // Configurar Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Configuración de encabezados para proxy inverso
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    // Si estás detrás de un proxy de confianza, añade las IPs de confianza
+    // options.KnownProxies.Add(IPAddress.Parse("10.0.0.1"));
+});
+
 var app = builder.Build();
 
-// Configuración del pipeline HTTP.
+// Configuración del pipeline HTTP
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.UseCors(AllowAll);      
+// Usar encabezados forwarded
+app.UseForwardedHeaders();
+
+// Redirección HTTPS
 app.UseHttpsRedirection();
 
+// Configuración de CORS
+app.UseCors(AllowAll);
+
+// Autorización
 app.UseAuthorization();
 
+// Mapeo de controladores
 app.MapControllers();
 
+// Endpoint de health check
 app.MapGet("/", () => "La API está en ejecución correctamente.");
 
-app.Run("http://0.0.0.0:5006");
+// Ejecutar la aplicación
+app.Run();
