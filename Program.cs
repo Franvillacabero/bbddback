@@ -46,17 +46,10 @@ builder.Services.AddCors(options =>
         });
 });
 
-// Configuración de Kestrel para HTTPS
+// Configuración de Kestrel - escuchar solo en localhost para que solo Nginx pueda acceder
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
-    serverOptions.Listen(IPAddress.Any, 5006, listenOptions =>
-    {
-        // Para desarrollo con certificado autofirmado
-        // listenOptions.UseHttps();
-        
-        // Para producción, especificar el certificado
-        // listenOptions.UseHttps("/path/to/certificate.pfx", "password");
-    });
+    serverOptions.Listen(IPAddress.Loopback, 5006); // Solo escuchar en localhost
 });
 
 // Añadir servicios al contenedor
@@ -66,10 +59,12 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Configuración de encabezados para proxy inverso
+// Configuración de encabezados para proxy inverso (importante para HTTPS)
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
     options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
 });
 
 var app = builder.Build();
@@ -81,11 +76,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// Usar encabezados forwarded
+// Usar encabezados forwarded - esto es crucial para HTTPS
 app.UseForwardedHeaders();
 
-// Redirección HTTPS
-app.UseHttpsRedirection();
+// Condicionar la redirección HTTPS para que no entre en conflicto con Nginx
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 // Configuración de CORS
 app.UseCors(AllowAll);
