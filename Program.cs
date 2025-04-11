@@ -70,8 +70,6 @@ builder.Services.AddSwaggerGen();
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
     options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
-    // Si estás detrás de un proxy de confianza, añade las IPs de confianza
-    // options.KnownProxies.Add(IPAddress.Parse("10.0.0.1"));
 });
 
 var app = builder.Build();
@@ -102,4 +100,4 @@ app.MapControllers();
 app.MapGet("/", () => "La API está en ejecución correctamente.");
 
 // Ejecutar la aplicación
-app.Run("http://0.0.0.0:80");
+app.Run();
