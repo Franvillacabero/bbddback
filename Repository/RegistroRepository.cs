@@ -107,11 +107,11 @@ namespace Back.Repository
                     command.Parameters.AddWithValue("@Id_TipoServicio", registro.Id_TipoServicio);
                     command.Parameters.AddWithValue("@Usuario", registro.Usuario);
                     command.Parameters.AddWithValue("@Contraseña", encryptedPassword);  // Guardamos la contraseña encriptada
-                    command.Parameters.AddWithValue("@Notas", registro.Notas ?? (object)DBNull.Value);  // Permitir valores nulos
-                    command.Parameters.AddWithValue("@Url", registro.Url ?? (object)DBNull.Value);  // Permitir valores nulos
-                    command.Parameters.AddWithValue("@Url_2", registro.Url_2 ?? (object)DBNull.Value);  // Permitir valores nulos
-                    command.Parameters.AddWithValue("@Isp", registro.Isp ?? (object)DBNull.Value);  // Permitir valores nulos
-                    command.Parameters.AddWithValue("@Nombre_BBDD", registro.Nombre_BBDD ?? (object)DBNull.Value);  // Permitir valores nulos
+                    command.Parameters.AddWithValue("@Notas", registro.Notas ?? (object)DBNull.Value);  
+                    command.Parameters.AddWithValue("@Url", registro.Url ?? (object)DBNull.Value); 
+                    command.Parameters.AddWithValue("@Url_2", registro.Url_2 ?? (object)DBNull.Value); 
+                    command.Parameters.AddWithValue("@Isp", registro.Isp ?? (object)DBNull.Value); 
+                    command.Parameters.AddWithValue("@Nombre_BBDD", registro.Nombre_BBDD ?? (object)DBNull.Value);
 
 
                     await command.ExecuteNonQueryAsync();
@@ -229,12 +229,12 @@ namespace Back.Repository
                                 Id_TipoServicio = reader.GetInt32(2),
                                 Usuario = reader.GetString(3),
                                 Contraseña = reader.GetString(4),
-                                Notas = reader.GetString(5),
-                                Url = reader.GetString(6),
-                                Url_2 = reader.GetString(7),
-                                Isp = reader.GetString(8),
-                                Nombre_BBDD = reader.GetString(9),
+                                Notas = reader.IsDBNull(5) ? null : reader.GetString(5),
                                 FechaCreacion = reader.GetDateTime(6),
+                                Url = reader.IsDBNull(7) ? null : reader.GetString(7),
+                                Url_2 = reader.IsDBNull(8) ? null : reader.GetString(8),
+                                Isp = reader.IsDBNull(9) ? null : reader.GetString(9),
+                                Nombre_BBDD = reader.IsDBNull(10) ? null : reader.GetString(10),
                             };
 
                             registros.Add(registro);
