@@ -15,13 +15,13 @@ RUN apt-get update && apt-get install -y nginx
 WORKDIR /app
 COPY --from=build /app/publish .
 
-# Copiar configuración de Nginx y certificados
-COPY nginx.conf /etc/nginx/nginx.conf
-COPY server.crt /etc/nginx/ssl/server.crt
-COPY server.key /etc/nginx/ssl/server.key
-
 # Crear directorios necesarios
 RUN mkdir -p /etc/nginx/ssl
+
+# Copiar configuración de Nginx y certificados
+COPY nginx.conf /etc/nginx/nginx.conf
+COPY ssl/server.crt /etc/nginx/ssl/server.crt
+COPY ssl/server.key /etc/nginx/ssl/server.key
 
 # Establecer permisos adecuados para los certificados
 RUN chmod 600 /etc/nginx/ssl/server.key
