@@ -74,6 +74,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// Middleware para verificar Referer
+app.UseMiddleware<Back.Middleware.ApiKeyMiddleware>();
+
 // Usar encabezados forwarded
 app.UseForwardedHeaders();
 
