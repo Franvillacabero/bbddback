@@ -33,11 +33,11 @@ builder.Services.AddScoped<IClienteService, ClienteService>(provider =>
 builder.Services.AddScoped<ITipoServicioService, TipoServicioService>(provider =>
     new TipoServicioService(provider.GetRequiredService<ITipoServicioRepository>()));
 
-// Configuración de CORS
-var AllowAll = "_AllowAll";
+// Configuración de CORS simple
+var AllowedOrigins = "_AllowedOrigins";
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(name: AllowAll,
+    options.AddPolicy(name: AllowedOrigins,
         policy =>
         {
             policy.AllowAnyOrigin()
@@ -46,10 +46,10 @@ builder.Services.AddCors(options =>
         });
 });
 
-// Configuración de Kestrel - escuchar solo en localhost para que solo Nginx pueda acceder
+// Configuración de Kestrel
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
-    serverOptions.Listen(IPAddress.Loopback, 5006); // Solo escuchar en localhost
+    serverOptions.Listen(IPAddress.Any, 5006);
 });
 
 // Añadir servicios al contenedor
@@ -59,12 +59,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Configuración de encabezados para proxy inverso (importante para HTTPS)
+// Configuración de encabezados para proxy inverso
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
     options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
-    options.KnownNetworks.Clear();
-    options.KnownProxies.Clear();
 });
 
 var app = builder.Build();
@@ -76,17 +74,48 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// Usar encabezados forwarded - esto es crucial para HTTPS
+// Usar encabezados forwarded
 app.UseForwardedHeaders();
 
-// Condicionar la redirección HTTPS para que no entre en conflicto con Nginx
-if (!app.Environment.IsDevelopment())
-{
-    app.UseHttpsRedirection();
-}
-
 // Configuración de CORS
-app.UseCors(AllowAll);
+app.UseCors(AllowedOrigins);
+
+// Middleware de seguridad para API
+app.UseWhen(context => 
+    context.Request.Path.StartsWithSegments("/api") && 
+    !context.Request.Path.Value.Contains("/api/Usuario/login"), 
+    appBuilder =>
+{
+    appBuilder.Use(async (context, next) =>
+    {
+        bool isAuthorized = false;
+        
+        // Verificar el token de Authorization
+        if (context.Request.Headers.TryGetValue("Authorization", out var authHeader))
+        {
+            var authValue = authHeader.ToString();
+            if (!string.IsNullOrEmpty(authValue) && authValue.StartsWith("Bearer "))
+            {
+                var token = authValue.Substring(7);
+                if (token == "admin-token") // El mismo token que usas en localStorage
+                {
+                    isAuthorized = true;
+                }
+            }
+        }
+        
+        if (isAuthorized)
+        {
+            await next();
+        }
+        else
+        {
+            context.Response.StatusCode = 401; // Unauthorized
+            context.Response.ContentType = "application/json";
+            await context.Response.WriteAsync("{\"mensaje\":\"Acceso no autorizado\"}");
+        }
+    });
+});
 
 // Autorización
 app.UseAuthorization();
