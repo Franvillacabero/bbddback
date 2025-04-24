@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
+using System.Net;
 
 namespace Back.Middleware
 {
@@ -7,6 +8,10 @@ namespace Back.Middleware
     {
         private readonly RequestDelegate _next;
         private readonly string _validToken;
+        private readonly List<string> _allowedIPs = new List<string> 
+        { 
+            "152.228.135.50"
+        };
 
         public AuthMiddleware(RequestDelegate next, IConfiguration config)
         {
@@ -16,17 +21,16 @@ namespace Back.Middleware
 
         public async Task InvokeAsync(HttpContext context)
         {
-            // Si hay un cookie de autenticación o el origen es correcto, permitir
             bool isAuthenticated = false;
             
-            // Comprobar si viene de tu origen (referer)
-            string referer = context.Request.Headers["Referer"].ToString();
-            if (!string.IsNullOrEmpty(referer) && referer.StartsWith("https://tu-frontend.com"))
+            // Verificar IP
+            string ipAddress = context.Connection.RemoteIpAddress?.ToString();
+            if (_allowedIPs.Contains(ipAddress))
             {
                 isAuthenticated = true;
             }
 
-            // O comprobar si tiene una cookie/token específico
+            // Mantener validación de token como respaldo
             if (context.Request.Cookies.TryGetValue("auth_token", out var token))
             {
                 if (token == _validToken)
