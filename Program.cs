@@ -41,7 +41,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: AllowedOrigins,
         policy =>
         {
-            policy.AllowAnyOrigin()
+            policy.WithOrigins("https://152.228.135.50:80") // cambia a https si aplica
                   .AllowAnyMethod()
                   .AllowAnyHeader();
         });
