@@ -9,8 +9,6 @@ services:
       - "5006"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-    depends_on:
-      - nginx
 
   nginx:
     image: nginx:alpine

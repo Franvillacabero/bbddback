@@ -19,35 +19,37 @@ namespace Back.Middleware
             _validToken = config["SecretToken"];
         }
 
-        public async Task InvokeAsync(HttpContext context)
+public async Task InvokeAsync(HttpContext context)
+{
+    bool isAuthenticated = false;
+
+    // Verifica que el Host o Referer coincida con tu dominio
+    string host = context.Request.Host.Host;
+    string referer = context.Request.Headers["Referer"].ToString();
+
+    if (host == "152.228.135.50" || referer.Contains("152.228.135.50"))
+    {
+        isAuthenticated = true;
+    }
+
+    // También puedes validar con el token si existe la cookie
+    if (context.Request.Cookies.TryGetValue("auth_token", out var token))
+    {
+        if (token == _validToken)
         {
-            bool isAuthenticated = false;
-            
-            // Verificar IP
-            string ipAddress = context.Connection.RemoteIpAddress?.ToString();
-            if (_allowedIPs.Contains(ipAddress))
-            {
-                isAuthenticated = true;
-            }
-
-            // Mantener validación de token como respaldo
-            if (context.Request.Cookies.TryGetValue("auth_token", out var token))
-            {
-                if (token == _validToken)
-                {
-                    isAuthenticated = true;
-                }
-            }
-
-            if (isAuthenticated)
-            {
-                await _next(context);
-            }
-            else
-            {
-                context.Response.StatusCode = 401;
-                await context.Response.WriteAsync("Acceso no autorizado");
-            }
+            isAuthenticated = true;
         }
     }
+
+    if (isAuthenticated)
+    {
+        await _next(context);
+    }
+    else
+    {
+        context.Response.StatusCode = 401;
+        await context.Response.WriteAsync("Acceso no autorizado");
+    }
+}
+
 }
