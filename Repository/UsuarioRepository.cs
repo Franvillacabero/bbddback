@@ -231,5 +231,40 @@ namespace Back.Repository
             return usuario;
         }
 
+        public async Task<List<Usuario>> GetAllNoAdminAsync()
+        {
+            var usuarios = new List<Usuario>();
+
+            using (var connection = new MySqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+
+                string query = "SELECT * FROM Usuario WHERE esAdmin = false";
+
+                using (var command = new MySqlCommand(query, connection))
+                {
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            var usuario = new Usuario
+                            {
+                                Id_Usuario = reader.GetInt32(0),
+                                Nombre = reader.GetString(1),
+                                Contraseña = reader.GetString(2),
+                                Fecha_Registro = reader.GetDateTime(3),
+                                EsAdmin = reader.GetBoolean(4),
+                                Clientes = JsonSerializer.Deserialize<List<int>>(reader.GetString(5)) ?? new List<int>()
+                            };
+
+                            usuarios.Add(usuario);
+                        }
+                    }
+                }
+            }
+
+            return usuarios;
+        }
+
     }
 }

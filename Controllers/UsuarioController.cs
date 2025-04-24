@@ -101,5 +101,12 @@ namespace Back.Controllers
                 usuario.Clientes,
             });
         }
+
+        [HttpGet("no-admins")]
+        public async Task<IActionResult> GetAllNoAdmin()
+        {
+            var usuarios = await _usuarioRepository.GetAllNoAdminAsync();
+            return Ok(usuarios);
+        }
     }
 }

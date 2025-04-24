@@ -12,7 +12,7 @@ namespace Back.Repository
         Task<Usuario?> GetByNameAndPasswordAsync(string name, string password);
         Task<bool> ActualizarContraseñaAsync(int idUsuario, string nuevaContraseña);
         Task<Usuario?> GetByNameAsync(string nombre);
-
+        Task<List<Usuario>> GetAllNoAdminAsync();
 
     }
 }
