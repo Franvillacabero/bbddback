@@ -16,16 +16,16 @@ WORKDIR /app
 COPY --from=build /app/publish .
 
 # Crear directorios necesarios
-RUN mkdir -p /etc/nginx/ssl
+RUN mkdir -p /ssl
 
 # Copiar configuración de Nginx y certificados
-COPY nginx.conf /etc/nginx/nginx.conf
-COPY ssl/server.crt /etc/nginx/ssl/server.crt
-COPY ssl/server.key /etc/nginx/ssl/server.key
+COPY nginx.conf /nginx.conf
+COPY ssl/server.crt /ssl/server.crt
+COPY ssl/server.key /ssl/server.key
 
 # Establecer permisos adecuados para los certificados
-RUN chmod 600 /etc/nginx/ssl/server.key
-RUN chmod 644 /etc/nginx/ssl/server.crt
+RUN chmod 600 /ssl/server.key
+RUN chmod 644 /ssl/server.crt
 
 # Script de inicio
 COPY start.sh /start.sh
