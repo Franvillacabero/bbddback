@@ -34,16 +34,20 @@ builder.Services.AddScoped<IClienteService, ClienteService>(provider =>
 builder.Services.AddScoped<ITipoServicioService, TipoServicioService>(provider =>
     new TipoServicioService(provider.GetRequiredService<ITipoServicioRepository>()));
 
-// Configuración de CORS simple
+// Configuración de CORS
 var AllowedOrigins = "_AllowedOrigins";
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: AllowedOrigins,
         policy =>
         {
-            policy.WithOrigins("https://152.228.135.50:80") // cambia a https si aplica
-                  .AllowAnyMethod()
-                  .AllowAnyHeader();
+            policy.WithOrigins(
+                "https://152.228.135.50", 
+                "http://152.228.135.50"
+            )
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials();
         });
 });
 
@@ -64,6 +68,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
     options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.KnownProxies.Clear(); // Importante para entornos con proxy
+    options.KnownNetworks.Clear(); // Importante para entornos con proxy
 });
 
 var app = builder.Build();
@@ -78,11 +84,11 @@ if (app.Environment.IsDevelopment())
 // Usar encabezados forwarded
 app.UseForwardedHeaders();
 
+// Middleware personalizado de autenticación
+app.UseMiddleware<AuthMiddleware>();
+
 // Configuración de CORS
 app.UseCors(AllowedOrigins);
-
-// Middleware para verificar Referer
-app.UseMiddleware<ApiKeyMiddleware>();
 
 // Autorización
 app.UseAuthorization();
