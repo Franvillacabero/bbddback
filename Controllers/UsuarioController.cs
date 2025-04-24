@@ -15,12 +15,12 @@ namespace Back.Controllers
             _usuarioRepository = usuarioRepository;
         }
 
-        /*[HttpGet]
+        [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             var usuarios = await _usuarioRepository.GetAllAsync();
             return Ok(usuarios);
-        }*/
+        }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
