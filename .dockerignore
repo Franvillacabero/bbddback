@@ -1,0 +1,15 @@
+# Carpetas de build que no se deben copiar
+bin/
+obj/
+.vscode/
+node_modules/
+
+# Archivos innecesarios o de configuración local
+*.user
+*.suo
+*.swp
+*.log
+
+# Ignorar certificados si no los necesitas en el build
+# (NO ignores ssl/ si lo montas como volumen en docker-compose)
+# ssl/
