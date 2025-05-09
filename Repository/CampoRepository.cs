@@ -1,54 +1,52 @@
-using MySql.Data.MySqlClient;
 using Models;
-using System.Text.Json;
+using MySql.Data.MySqlClient;
 
 namespace Back.Repository
 {
-    public class TipoServicioRepository : ITipoServicioRepository
+    public class CampoRepository : ICampoRepository
     {
         private readonly string _connectionString;
 
-        public TipoServicioRepository(string connectionString)
+        public CampoRepository(string connectionString)
         {
             _connectionString = connectionString;
         }
 
-        public async Task<List<TipoServicio>> GetAllAsync()
+        public async Task<List<Campo>> GetAllAsync()
         {
-            var tipoServicios = new List<TipoServicio>();
+            var campos = new List<Campo>();
 
             using (var connection = new MySqlConnection(_connectionString))
             {
                 await connection.OpenAsync();
 
-                string query = "SELECT * FROM TipoServicio";
+                string query = "SELECT * FROM Campo";
                 using (var command = new MySqlCommand(query, connection))
                 using (var reader = await command.ExecuteReaderAsync())
                 {
                     while (await reader.ReadAsync())
                     {
-                        tipoServicios.Add(new TipoServicio
+                        campos.Add(new Campo
                         {
-                            Id_TipoServicio = reader.GetInt32(0),
-                            Nombre = reader.GetString(1),
-                            Campos = JsonSerializer.Deserialize<List<int>>(reader.GetString(2)) ?? new List<int>()
+                            Id = reader.GetInt32(0),
+                            Nombre = reader.GetString(1)
                         });
                     }
                 }
             }
 
-            return tipoServicios;
+            return campos;
         }
 
-        public async Task<TipoServicio?> GetByIdAsync(int id)
+        public async Task<Campo?> GetByIdAsync(int id)
         {
-            TipoServicio? tipoServicio = null;
+            Campo? campo = null;
 
             using (var connection = new MySqlConnection(_connectionString))
             {
                 await connection.OpenAsync();
 
-                string query = "SELECT * FROM TipoServicio WHERE Id_TipoServicio = @Id";
+                string query = "SELECT * FROM Campo WHERE Id = @Id";
                 using (var command = new MySqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Id", id);
@@ -57,56 +55,45 @@ namespace Back.Repository
                     {
                         if (await reader.ReadAsync())
                         {
-                            tipoServicio = new TipoServicio
+                            campo = new Campo
                             {
-                                Id_TipoServicio = reader.GetInt32(0),
-                                Nombre = reader.GetString(1),
-                                Campos = JsonSerializer.Deserialize<List<int>>(reader.GetString(2)) ?? new List<int>()
+                                Id = reader.GetInt32(0),
+                                Nombre = reader.GetString(1)
                             };
                         }
                     }
                 }
             }
 
-            return tipoServicio;
+            return campo;
         }
 
-        public async Task AddAsync(TipoServicio tipoServicio)
+        public async Task AddAsync(Campo campo)
         {
             using (var connection = new MySqlConnection(_connectionString))
             {
                 await connection.OpenAsync();
 
-                string query = "INSERT INTO TipoServicio (Nombre, Campos) VALUES (@Nombre, @Campos)";
+                string query = "INSERT INTO Campo (Nombre) VALUES (@Nombre)";
                 using (var command = new MySqlCommand(query, connection))
                 {
-                    command.Parameters.AddWithValue("@Nombre", tipoServicio.Nombre);
-
-                    var camposParam = new MySqlParameter("@Campos", MySqlDbType.JSON);
-                    camposParam.Value = JsonSerializer.Serialize(tipoServicio.Campos);
-                    command.Parameters.Add(camposParam);
-
+                    command.Parameters.AddWithValue("@Nombre", campo.Nombre);
                     await command.ExecuteNonQueryAsync();
                 }
             }
         }
 
-        public async Task UpdateAsync(TipoServicio tipoServicio)
+        public async Task UpdateAsync(Campo campo)
         {
             using (var connection = new MySqlConnection(_connectionString))
             {
                 await connection.OpenAsync();
 
-                string query = "UPDATE TipoServicio SET Nombre = @Nombre, Campos = @Campos WHERE Id_TipoServicio = @Id";
+                string query = "UPDATE Campo SET Nombre = @Nombre WHERE Id = @Id";
                 using (var command = new MySqlCommand(query, connection))
                 {
-                    command.Parameters.AddWithValue("@Id", tipoServicio.Id_TipoServicio);
-                    command.Parameters.AddWithValue("@Nombre", tipoServicio.Nombre);
-
-                    var camposParam = new MySqlParameter("@Campos", MySqlDbType.JSON);
-                    camposParam.Value = JsonSerializer.Serialize(tipoServicio.Campos);
-                    command.Parameters.Add(camposParam);
-
+                    command.Parameters.AddWithValue("@Id", campo.Id);
+                    command.Parameters.AddWithValue("@Nombre", campo.Nombre);
                     await command.ExecuteNonQueryAsync();
                 }
             }
@@ -118,7 +105,7 @@ namespace Back.Repository
             {
                 await connection.OpenAsync();
 
-                string query = "DELETE FROM TipoServicio WHERE Id_TipoServicio = @Id";
+                string query = "DELETE FROM Campo WHERE Id = @Id";
                 using (var command = new MySqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Id", id);

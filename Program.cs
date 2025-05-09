@@ -21,6 +21,9 @@ builder.Services.AddScoped<IClienteRepository, ClienteRepository>(provider =>
 builder.Services.AddScoped<ITipoServicioRepository, TipoServicioRepository>(provider =>
     new TipoServicioRepository(connectionString));
 
+builder.Services.AddScoped<ICampoRepository, CampoRepository>(provider =>
+    new CampoRepository(connectionString));
+
 // Servicios
 builder.Services.AddScoped<IUsuarioService, UsuarioService>(provider =>
     new UsuarioService(provider.GetRequiredService<IUsuarioRepository>()));
@@ -33,6 +36,9 @@ builder.Services.AddScoped<IClienteService, ClienteService>(provider =>
 
 builder.Services.AddScoped<ITipoServicioService, TipoServicioService>(provider =>
     new TipoServicioService(provider.GetRequiredService<ITipoServicioRepository>()));
+
+builder.Services.AddScoped<ICampoService, CampoService>(provider =>
+    new CampoService(provider.GetRequiredService<ICampoRepository>()));
 
 // Configuración de CORS
 var AllowedOrigins = "_AllowedOrigins";
