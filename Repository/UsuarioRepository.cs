@@ -35,7 +35,8 @@ namespace Back.Repository
                             Contraseña = reader.GetString(2),
                             Fecha_Registro = reader.GetDateTime(3),
                             EsAdmin = reader.GetBoolean(4),
-                            Clientes = JsonSerializer.Deserialize<List<int>>(reader.GetString(5)) ?? new List<int>()
+                            Clientes = JsonSerializer.Deserialize<List<int>>(reader.GetString(5)) ?? new List<int>(),
+                            EsEditor = reader.GetBoolean(6)
                         };
 
                         usuarios.Add(usuario);
@@ -69,7 +70,8 @@ namespace Back.Repository
                                 Contraseña = reader.GetString(2),
                                 Fecha_Registro = reader.GetDateTime(3),
                                 EsAdmin = reader.GetBoolean(4),
-                                Clientes = JsonSerializer.Deserialize<List<int>>(reader.GetString(5)) ?? new List<int>()
+                                Clientes = JsonSerializer.Deserialize<List<int>>(reader.GetString(5)) ?? new List<int>(),
+                                EsEditor = reader.GetBoolean(6)
                             };
                         }
                     }
@@ -87,7 +89,7 @@ namespace Back.Repository
                 // Hashear la contraseña antes de guardar usando BCrypt
                 string hashedPassword = BCrypt.Net.BCrypt.HashPassword(usuario.Contraseña);
 
-                string query = "INSERT INTO Usuario (Nombre, Contraseña, Fecha_Registro, EsAdmin, Clientes) VALUES (@Nombre, @Contraseña, @Fecha_Registro, @EsAdmin, @Clientes)";
+                string query = "INSERT INTO Usuario (Nombre, Contraseña, Fecha_Registro, EsAdmin, CLientes, EsEditor) VALUES (@Nombre, @Contraseña, @Fecha_Registro, @EsAdmin, @Clientes, @EsEditor)";
                 using (var command = new MySqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Nombre", usuario.Nombre);
@@ -98,6 +100,7 @@ namespace Back.Repository
                     var clientesParam = new MySqlParameter("@Clientes", MySqlDbType.JSON);
                     clientesParam.Value = JsonSerializer.Serialize(usuario.Clientes);
                     command.Parameters.Add(clientesParam);
+                    command.Parameters.AddWithValue("@EsEditor", usuario.EsEditor);
 
                     await command.ExecuteNonQueryAsync();
                 }
@@ -124,7 +127,7 @@ namespace Back.Repository
                     hashedPassword = usuario.Contraseña; // Ya está hasheada
                 }
 
-                string query = "UPDATE Usuario SET Nombre = @Nombre, Contraseña = @Contraseña, Fecha_Registro = @Fecha_Registro, EsAdmin = @EsAdmin, Clientes = @Clientes WHERE Id_Usuario = @Id";
+                string query = "UPDATE Usuario SET Nombre = @Nombre, Contraseña = @Contraseña, Fecha_Registro = @Fecha_Registro, EsAdmin = @EsAdmin, Clientes = @Clientes, EsEditor = @EsEditor WHERE Id_Usuario = @Id";
                 using (var command = new MySqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Id", usuario.Id_Usuario);
@@ -136,6 +139,7 @@ namespace Back.Repository
                     var clientesParam = new MySqlParameter("@Clientes", MySqlDbType.JSON);
                     clientesParam.Value = JsonSerializer.Serialize(usuario.Clientes);
                     command.Parameters.Add(clientesParam);
+                    command.Parameters.AddWithValue("@EsEditor", usuario.EsEditor);
 
                     await command.ExecuteNonQueryAsync();
                 }
@@ -221,7 +225,8 @@ namespace Back.Repository
                                 Contraseña = reader.GetString(2),
                                 Fecha_Registro = reader.GetDateTime(3),
                                 EsAdmin = reader.GetBoolean(4),
-                                Clientes = JsonSerializer.Deserialize<List<int>>(reader.GetString(5)) ?? new List<int>()
+                                Clientes = JsonSerializer.Deserialize<List<int>>(reader.GetString(5)) ?? new List<int>(),
+                                EsEditor = reader.GetBoolean(6)
                             };
                         }
                     }
@@ -254,7 +259,8 @@ namespace Back.Repository
                                 Contraseña = reader.GetString(2),
                                 Fecha_Registro = reader.GetDateTime(3),
                                 EsAdmin = reader.GetBoolean(4),
-                                Clientes = JsonSerializer.Deserialize<List<int>>(reader.GetString(5)) ?? new List<int>()
+                                Clientes = JsonSerializer.Deserialize<List<int>>(reader.GetString(5)) ?? new List<int>(),
+                                EsEditor = reader.GetBoolean(6)
                             };
 
                             usuarios.Add(usuario);

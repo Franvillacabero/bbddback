@@ -99,6 +99,7 @@ namespace Back.Controllers
                 usuario.Nombre,
                 usuario.EsAdmin,
                 usuario.Clientes,
+                usuario.EsEditor,
             });
         }
 

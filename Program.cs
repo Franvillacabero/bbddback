@@ -85,7 +85,7 @@ if (app.Environment.IsDevelopment())
 app.UseForwardedHeaders();
 
 // Middleware personalizado de autenticación
-app.UseMiddleware<AuthMiddleware>();
+//app.UseMiddleware<AuthMiddleware>();
 
 // Configuración de CORS
 app.UseCors(AllowedOrigins);
